@@ -20,29 +20,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 from datetime import date
 from typing import List
 
-from .asset import Asset
-
-
-class PortfolioAsset:
-    def __init__(self, asset: Asset, weight: float):
-        self.asset = asset
-        self.weight = weight
-        self._check_validity()
-
-    def get_asset(self) -> Asset:
-        return self.asset
-
-    def get_weight(self) -> float:
-        return self.weight
-
-    def _check_validity(self) -> bool:
-        if not self.get_asset():
-            raise ValueError("Asset cannot be None.")
-
-        if not (0 < self.get_weight() <= 1):
-            raise ValueError(f"Weight {self.get_weight()} for asset {self.get_asset().get_code()} is not valid. Must be between 0 and 1.")
-
-        return True
+from .portfolio_asset import PortfolioAsset
 
 
 class Portfolio:

@@ -20,17 +20,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 from datetime import date
 from typing import List
 
-
-class Price:
-    def __init__(self, date: date, value: float):
-        self.date = date
-        self.value = value
-
-    def get_date(self) -> date:
-        return self.date
-
-    def get_value(self) -> float:
-        return self.value
+from .price import Price
 
 
 class Asset:

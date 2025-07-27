@@ -17,10 +17,16 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 """
 
 
-from .asset import Asset
-from .portfolio_asset import PortfolioAsset
-from .portfolio import Portfolio
-from .price import Price
+from datetime import date
 
 
-__all__ = ["Asset", "Price", "Portfolio", "PortfolioAsset"]
+class Price:
+    def __init__(self, date: date, value: float):
+        self.date = date
+        self.value = value
+
+    def get_date(self) -> date:
+        return self.date
+
+    def get_value(self) -> float:
+        return self.value
