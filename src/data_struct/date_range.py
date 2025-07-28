@@ -17,26 +17,22 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 """
 
 
-from typing import List
-
-from .portfolio_asset import PortfolioAsset
+from datetime import date
 
 
-class Portfolio:
-    def __init__(self, title: str, assets: List[PortfolioAsset]):
-        self.title = title
-        self.assets = assets
+class DateRange:
+    def __init__(self, start_date: date, end_date: date):
+        self.start_date = start_date
+        self.end_date = end_date
         self._check_validity()
 
-    def get_title(self) -> str:
-        return self.title
+    def get_start_date(self) -> date:
+        return self.start_date
 
-    def get_assets(self) -> List[PortfolioAsset]:
-        return self.assets
+    def get_end_date(self) -> date:
+        return self.end_date
 
     def _check_validity(self) -> bool:
-        total_weight = sum(asset.get_weight() for asset in self.get_assets())
-        if total_weight != 1.0:
-            raise ValueError(f"Total weight of assets in portfolio '{self.get_title()}' must equal 1.0, but is {total_weight}.")
-
+        if self.get_start_date() > self.get_end_date():
+            raise ValueError("Start date must be before end date.")
         return True

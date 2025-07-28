@@ -17,9 +17,9 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 """
 
 
-from datetime import date
 from typing import List
 
+from .date_range import DateRange
 from .price import Price
 
 
@@ -35,8 +35,8 @@ class Asset:
     def get_name(self) -> str:
         return self.name
 
-    def get_prices(self, start_date: date, end_date: date) -> List[Price]:
+    def get_prices(self, date_range: DateRange) -> List[Price]:
         return [
             p for p in self.prices
-            if start_date <= p.get_date() <= end_date
+            if date_range.get_start_date() <= p.get_date() <= date_range.get_end_date()
         ]

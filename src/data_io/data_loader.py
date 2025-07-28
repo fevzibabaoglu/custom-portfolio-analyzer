@@ -23,7 +23,7 @@ import pandas as pd
 from datetime import datetime
 from typing import List
 
-from data_struct import Asset, Price, Portfolio, PortfolioAsset
+from data_struct import Asset, DateRange, PortfolioAsset, PortfolioComparison, Portfolio, Price
 
 
 class DataLoader:
@@ -31,20 +31,20 @@ class DataLoader:
 
     def __init__(
         self,
-        asset_data_path = 'data/fund_data.csv',
-        portfolio_path = 'data/portfolio_config.json',
+        asset_data_path = 'data/asset_data.csv',
+        portfolio_comparison_config_path = 'data/portfolio_comparison_config.json',
     ):
         self.asset_data_path = asset_data_path
-        self.portfolio_path = portfolio_path
+        self.portfolio_comparison_config_path = portfolio_comparison_config_path
 
-        self.assets_data = self.load_asset_data()
-        self.portfolios = self.load_portfolios()
+        self.asset_data = self.load_asset_data()
+        self.portfolio_comparisons = self.load_portfolio_comparisons()
 
-    def get_assets_data(self) -> List[Asset]:
-        return self.assets_data
+    def get_asset_data(self) -> List[Asset]:
+        return self.asset_data
 
-    def get_portfolios(self) -> List[Portfolio]:
-        return self.portfolios
+    def get_portfolio_comparisons(self) -> List[PortfolioComparison]:
+        return self.portfolio_comparisons
 
     def load_asset_data(self) -> List[Asset]:
         assets = []
@@ -70,30 +70,71 @@ class DataLoader:
 
         return assets
 
-    def load_portfolios(self) -> List[Portfolio]:
+    def load_portfolio_comparisons(self) -> List[PortfolioComparison]:
+        portfolio_comparisons = []
+
+        with open(self.portfolio_comparison_config_path, 'r', encoding='utf-8') as file:
+            portfolio_comparison_data = json.load(file)
+
+        for item in portfolio_comparison_data:
+            title = item['title']
+            date_ranges = self._load_date_ranges(item['date_ranges'])
+            portfolios = self._load_portfolios(item['portfolios'])
+
+            portfolio_comparison = PortfolioComparison(
+                title=title,
+                date_ranges=date_ranges,
+                portfolios=portfolios,
+            )
+            portfolio_comparisons.append(portfolio_comparison)
+
+        return portfolio_comparisons
+
+    def _load_date_ranges(self, date_range_data: List[dict]) -> List[DateRange]:
+        date_ranges = []
+
+        for item in date_range_data:
+            start_date_str = item['start']
+            end_date_str = item['end']
+
+            if start_date_str.lower() == 'today':
+                start_date = datetime.today().date()
+            else:
+                start_date = datetime.strptime(start_date_str, self.DATE_FORMAT).date()
+
+            if end_date_str.lower() == 'today':
+                end_date = datetime.today().date()
+            else:
+                end_date = datetime.strptime(end_date_str, self.DATE_FORMAT).date()
+
+            date_range = DateRange(start_date=start_date, end_date=end_date)
+            date_ranges.append(date_range)
+
+        return date_ranges
+
+    def _load_portfolios(self, portfolio_data: List[dict]) -> List[Portfolio]:
         portfolios = []
 
-        with open(self.portfolio_path, 'r', encoding='utf-8') as file:
-            portfolio_data = json.load(file)
-
         for item in portfolio_data:
-            assets = [
-                PortfolioAsset(
-                    asset=next(
-                        (a for a in self.assets_data if a.get_code() == asset['code']),
-                        None
-                    ),
-                    weight=asset['weight']
-                )
-                for asset in item['assets']
-            ]
+            title = item['title']
+            assets = self._load_portfolio_assets(item['assets'])
 
-            portfolio = Portfolio(
-                title=item['title'],
-                start_date=datetime.strptime(item['start_date'], self.DATE_FORMAT),
-                end_date=datetime.strptime(item['end_date'], self.DATE_FORMAT),
-                assets=assets,
-            )
+            portfolio = Portfolio(title=title, assets=assets)
             portfolios.append(portfolio)
 
         return portfolios
+    
+    def _load_portfolio_assets(self, portfolio_asset_data: List[dict]) -> List[PortfolioAsset]:
+        portfolio_assets = []
+
+        for item in portfolio_asset_data:
+            asset = next(
+                (a for a in self.asset_data if a.get_code() == item['code']),
+                None
+            )
+            weight = item['weight']
+
+            portfolio_asset = PortfolioAsset(asset=asset, weight=weight)
+            portfolio_assets.append(portfolio_asset)
+
+        return portfolio_assets

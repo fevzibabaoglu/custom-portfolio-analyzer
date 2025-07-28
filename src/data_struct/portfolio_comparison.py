@@ -19,24 +19,21 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 from typing import List
 
-from .portfolio_asset import PortfolioAsset
+from .date_range import DateRange
+from .portfolio import Portfolio
 
 
-class Portfolio:
-    def __init__(self, title: str, assets: List[PortfolioAsset]):
+class PortfolioComparison:
+    def __init__(self, title:str,  date_ranges: List[DateRange], portfolios: List[Portfolio]):
         self.title = title
-        self.assets = assets
-        self._check_validity()
+        self.date_ranges = date_ranges
+        self.portfolios = portfolios
 
     def get_title(self) -> str:
         return self.title
 
-    def get_assets(self) -> List[PortfolioAsset]:
-        return self.assets
+    def get_date_ranges(self) -> List[DateRange]:
+        return self.date_ranges
 
-    def _check_validity(self) -> bool:
-        total_weight = sum(asset.get_weight() for asset in self.get_assets())
-        if total_weight != 1.0:
-            raise ValueError(f"Total weight of assets in portfolio '{self.get_title()}' must equal 1.0, but is {total_weight}.")
-
-        return True
+    def get_portfolios(self) -> List[Portfolio]:
+        return self.portfolios

@@ -18,9 +18,11 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 
 from .asset import Asset
+from .date_range import DateRange
 from .portfolio_asset import PortfolioAsset
+from .portfolio_comparison import PortfolioComparison
 from .portfolio import Portfolio
 from .price import Price
 
 
-__all__ = ["Asset", "Price", "Portfolio", "PortfolioAsset"]
+__all__ = ["Asset", "DateRange", "PortfolioAsset", "PortfolioComparison", "Portfolio", "Price"]
