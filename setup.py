@@ -22,7 +22,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="custom-portfolio-analyzer",
-    version="0.0.0",
+    version="1.0.0",
     packages=find_packages(where="src"),
     package_dir={"": "src"},
 )
