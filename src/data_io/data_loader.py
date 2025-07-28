@@ -29,6 +29,10 @@ from data_struct import Asset, DateRange, PortfolioAsset, PortfolioComparison, P
 class DataLoader:
     DATE_FORMAT = "%d.%m.%Y"
 
+    @classmethod
+    def set_date_format(cls, date_format: str):
+        cls.date_format = date_format
+
     def __init__(
         self,
         asset_data_path = 'data/asset_data.csv',

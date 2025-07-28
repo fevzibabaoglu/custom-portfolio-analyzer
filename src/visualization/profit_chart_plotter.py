@@ -17,7 +17,9 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 """
 
 
+import matplotlib.dates as mdates
 import matplotlib.pyplot as plt
+from matplotlib.dates import DateFormatter
 from matplotlib.ticker import PercentFormatter
 from typing import List
 
@@ -25,6 +27,12 @@ from data_struct import PerformancePortfolioComparison
 
 
 class ProfitChartPlotter:
+    date_format = "%d.%m.%Y"
+
+    @classmethod
+    def set_date_format(cls, date_format: str):
+        cls.date_format = date_format
+
     def __init__(self, performance_portfolio_comparisons: List[PerformancePortfolioComparison]):
         self.performance_portfolio_comparisons = performance_portfolio_comparisons
         self._check_validity()
@@ -50,14 +58,21 @@ class ProfitChartPlotter:
                 ax.plot(dates, profit_ratios, label=label, linewidth=2)
 
             # Format the plot
-            ax.set_title(f"Profit Ratios: {start_date} to {end_date}", fontsize=14, weight='bold')
+            ax.set_title(
+                f"Profit Ratios: {start_date.strftime(self.date_format)} to {end_date.strftime(self.date_format)}",
+                fontsize=14,
+                weight='bold',
+            )
             ax.set_xlabel("Date", fontsize=12)
             ax.set_ylabel("Profit Ratio", fontsize=12)
             ax.yaxis.set_major_formatter(PercentFormatter(xmax=1.0))
-            ax.grid(True, which='major', axis='y', linestyle='--', alpha=0.5)
 
+            # Format x-axis ticks as dd.mm.yyyy
+            ax.xaxis.set_major_formatter(DateFormatter(self.date_format))
+            ax.xaxis.set_major_locator(mdates.AutoDateLocator())
+
+            ax.grid(True, which='major', axis='y', linestyle='--', alpha=0.5)
             ax.legend(title="Assets", loc='upper left', fontsize=10)
-            plt.xticks(rotation=45, ha='right')
             plt.tight_layout()
             plt.show()
 
