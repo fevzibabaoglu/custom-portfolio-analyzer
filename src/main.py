@@ -17,8 +17,75 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 """
 
 
+import argparse
+import logging
+from datetime import date
+
+from analyze import analyzer
+from data_io import DataLoader
+from visualization import ProfitChartPlotter
+
+
+# Configurations
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(message)s",
+    handlers=[
+        logging.StreamHandler()
+    ]
+)
+
+
+def validate_date_format(fmt: str) -> str:
+    """Validate that the date format is usable with strftime/strptime."""
+    try:
+        date.today().strftime(fmt)
+        return fmt
+    except Exception as e:
+        raise argparse.ArgumentTypeError(f"Invalid date format: {fmt}. Error: {e}")
+
 def main():
-    pass
+    parser = argparse.ArgumentParser(
+        description="Run portfolio performance analysis and chart plotting."
+    )
+    parser.add_argument(
+        '--asset-data-path',
+        type=str,
+        default='data/asset_data.csv',
+        help='Path to the asset data CSV file',
+    )
+    parser.add_argument(
+        '--config-path',
+        type=str,
+        default='data/portfolio_comparison_config.json',
+        help='Path to the portfolio comparison config JSON file',
+    )
+    parser.add_argument(
+        '--date-format',
+        type=validate_date_format,
+        default='%d.%m.%Y',
+        help='Date format string for displaying dates (default: "%d.%m.%Y")'
+    )
+    args = parser.parse_args()
+
+    # Set the date format for classes
+    ProfitChartPlotter.set_date_format(args.date_format)
+    DataLoader.set_date_format(args.date_format)
+
+    loader = DataLoader(
+        asset_data_path=args.asset_data_path,
+        portfolio_comparison_config_path=args.config_path,
+    )
+    portfolio_comparisons = loader.get_portfolio_comparisons()
+
+    for portfolio_comparison in portfolio_comparisons:
+        logging.info(f"Analyzing portfolio comparison: {portfolio_comparison.get_title()}")
+
+        analyzer_instance = analyzer.Analyzer(portfolio_comparison)
+        performance_portfolio_comparisons = analyzer_instance.get_performance_portfolio_comparison_list()
+
+        plotter = ProfitChartPlotter(performance_portfolio_comparisons=performance_portfolio_comparisons)
+        plotter.plot_charts()
 
 
 if __name__ == '__main__':
