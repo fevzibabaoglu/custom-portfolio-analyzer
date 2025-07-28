@@ -44,12 +44,16 @@ class PortfolioComparison:
             raise ValueError("Comparison title cannot be empty.")
         if not isinstance(self.get_title(), str):
             raise ValueError("Comparison title must be a string.")
-        if not self.get_date_ranges() or len(self.get_date_ranges()) == 0:
-            raise ValueError("At least one date range is required for comparison.")
+        if not self.get_date_ranges():
+            raise ValueError("Date ranges cannot be empty.")
+        if not isinstance(self.get_date_ranges(), list):
+            raise ValueError("Date ranges must be a list.")
         if not all(isinstance(date_range, DateRange) for date_range in self.get_date_ranges()):
             raise ValueError("All date ranges must be instances of the DateRange class.")
-        if not self.get_portfolios() or len(self.get_portfolios()) == 0:
-            raise ValueError("At least one portfolio is required for comparison.")
+        if not self.get_portfolios():
+            raise ValueError("Portfolios cannot be empty.")
+        if not isinstance(self.get_portfolios(), list):
+            raise ValueError("Portfolios must be a list.")
         if not all(isinstance(portfolio, Portfolio) for portfolio in self.get_portfolios()):
             raise ValueError("All portfolios must be instances of the Portfolio class.")
 

@@ -62,8 +62,10 @@ class Asset:
             raise ValueError("Asset name cannot be empty.")
         if not isinstance(self.get_name(), str):
             raise ValueError("Asset name must be a string.")
-        if not self.get_prices() or len(self.get_prices()) == 0:
-            raise ValueError("Asset must have at least one price.")
+        if not self.get_prices():
+            raise ValueError("Prices cannot be empty.")
+        if not isinstance(self.get_prices(), list):
+            raise ValueError("Prices must be a list.")
         if not all(isinstance(price, Price) for price in self.get_prices()):
             raise ValueError("All prices must be instances of the Price class.")
         return True

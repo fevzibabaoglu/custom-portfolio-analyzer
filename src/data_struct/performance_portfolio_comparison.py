@@ -40,8 +40,10 @@ class PerformancePortfolioComparison:
             raise ValueError("Date range cannot be empty.")
         if not isinstance(self.date_range, DateRange):
             raise ValueError("Date range must be an instance of the DateRange class.")
-        if not self.performance_assets or len(self.performance_assets) == 0:
-            raise ValueError("At least one performance asset is required for comparison.")
+        if not self.performance_assets:
+            raise ValueError("Performance assets cannot be empty.")
+        if not isinstance(self.performance_assets, list):
+            raise ValueError("Performance assets must be a list.")
         if not all(isinstance(asset, PerformanceAsset) for asset in self.performance_assets):
             raise ValueError("All performance assets must be instances of the PerformanceAsset class.")
         return True

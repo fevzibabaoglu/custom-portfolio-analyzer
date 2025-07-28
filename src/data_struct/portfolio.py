@@ -39,8 +39,10 @@ class Portfolio:
             raise ValueError("Portfolio title cannot be empty.")
         if not isinstance(self.get_title(), str):
             raise ValueError("Portfolio title must be a string.")
-        if not self.get_assets() or len(self.get_assets()) == 0:
-            raise ValueError("Portfolio must have at least one asset.")
+        if not self.get_assets():
+            raise ValueError("Assets cannot be empty.")
+        if not isinstance(self.get_assets(), list):
+            raise ValueError("Assets must be a list.")
         if not all(isinstance(asset, PortfolioAsset) for asset in self.get_assets()):
             raise ValueError("All assets must be instances of the PortfolioAsset class.")
 
