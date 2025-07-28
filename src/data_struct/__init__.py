@@ -20,10 +20,20 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 from .asset import Asset
 from .date_range import DateRange
 from .performance_asset import PerformanceAsset
+from .performance_portfolio_comparison import PerformancePortfolioComparison
 from .portfolio_asset import PortfolioAsset
 from .portfolio_comparison import PortfolioComparison
 from .portfolio import Portfolio
 from .price import Price
 
 
-__all__ = ["Asset", "DateRange", "PerformanceAsset", "PortfolioAsset", "PortfolioComparison", "Portfolio", "Price"]
+__all__ = [
+    "Asset",
+    "DateRange",
+    "PerformanceAsset",
+    "PerformancePortfolioComparison",
+    "PortfolioAsset",
+    "PortfolioComparison",
+    "Portfolio",
+    "Price",
+]
