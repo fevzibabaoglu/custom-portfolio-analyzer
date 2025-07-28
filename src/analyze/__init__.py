@@ -17,12 +17,8 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 """
 
 
-from setuptools import setup, find_packages
+from .analyzer import Analyzer
+from .portfolio_performance_generator import PortfolioPerformanceGenerator
 
 
-setup(
-    name="custom-portfolio-analyzer",
-    version="1.0.0",
-    packages=find_packages(where="src"),
-    package_dir={"": "src"},
-)
+__all__ = ["Analyzer", "PortfolioPerformanceGenerator"]
