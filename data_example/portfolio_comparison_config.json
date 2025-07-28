@@ -1,0 +1,26 @@
+[
+    {
+        "title": "Portfolio Comparison Scenario 1",
+        "date_ranges": [
+            {"start": "02.01.2025", "end": "30.05.2025"},
+            {"start": "03.04.2025", "end": "today"}
+        ],
+        "portfolios": [
+            {
+                "title": "Test Portfolio 1",
+                "assets": [
+                    {"code": "fund_1", "weight": 0.6},
+                    {"code": "fund_2", "weight": 0.4}
+                ]
+            },
+            {
+                "title": "Test Portfolio 2",
+                "assets": [
+                    {"code": "fund_1", "weight": 0.5},
+                    {"code": "fund_2", "weight": 0.3},
+                    {"code": "fund_3", "weight": 0.2}
+                ]
+            }
+        ]
+    }
+]
