@@ -33,6 +33,14 @@ class DateRange:
         return self.end_date
 
     def _check_validity(self) -> bool:
+        if not self.get_start_date():
+            raise ValueError("Start date cannot be empty.")
+        if not isinstance(self.get_start_date(), date):
+            raise ValueError("Start date must be an instance of the date class.")
+        if not self.get_end_date():
+            raise ValueError("End date cannot be empty.")
+        if not isinstance(self.get_end_date(), date):
+            raise ValueError("End date must be an instance of the date class.")
         if self.get_start_date() > self.get_end_date():
             raise ValueError("Start date must be before end date.")
         return True

@@ -33,7 +33,14 @@ class PortfolioAsset:
         return self.weight
 
     def _check_validity(self) -> bool:
+        if not self.get_asset():
+            raise ValueError("Asset cannot be empty.")
+        if not isinstance(self.get_asset(), Asset):
+            raise ValueError("Asset must be an instance of the Asset class.")
+        if self.get_weight() is None:
+            raise ValueError("Weight cannot be None.")
+        if not isinstance(self.get_weight(), float):
+            raise ValueError("Weight must be a float number.")
         if not (0 < self.get_weight() <= 1):
-            raise ValueError(f"Weight {self.get_weight()} for asset {self.get_asset().get_code()} is not valid. Must be between 0 and 1.")
-
+            raise ValueError("Weight must be between 0 and 1.")
         return True

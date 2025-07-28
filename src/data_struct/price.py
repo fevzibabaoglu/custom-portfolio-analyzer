@@ -24,9 +24,23 @@ class Price:
     def __init__(self, date: date, value: float):
         self.date = date
         self.value = value
+        self._check_validity()
 
     def get_date(self) -> date:
         return self.date
 
     def get_value(self) -> float:
         return self.value
+    
+    def _check_validity(self) -> bool:
+        if not self.get_date():
+            raise ValueError("Date cannot be empty.")
+        if not isinstance(self.get_date(), date):
+            raise ValueError("Date must be instance of the date class.")
+        if not self.get_value():
+            raise ValueError("Price value cannot be empty.")
+        if not isinstance(self.get_value(), float):
+            raise ValueError("Price value must be a float number.")
+        if self.get_value() < 0:
+            raise ValueError("Price value cannot be negative.")
+        return True

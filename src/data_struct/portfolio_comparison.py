@@ -28,6 +28,7 @@ class PortfolioComparison:
         self.title = title
         self.date_ranges = date_ranges
         self.portfolios = portfolios
+        self._check_validity()
 
     def get_title(self) -> str:
         return self.title
@@ -37,3 +38,31 @@ class PortfolioComparison:
 
     def get_portfolios(self) -> List[Portfolio]:
         return self.portfolios
+
+    def _check_validity(self) -> bool:
+        if not self.get_title():
+            raise ValueError("Comparison title cannot be empty.")
+        if not isinstance(self.get_title(), str):
+            raise ValueError("Comparison title must be a string.")
+        if not self.get_date_ranges() or len(self.get_date_ranges()) == 0:
+            raise ValueError("At least one date range is required for comparison.")
+        if not all(isinstance(date_range, DateRange) for date_range in self.get_date_ranges()):
+            raise ValueError("All date ranges must be instances of the DateRange class.")
+        if not self.get_portfolios() or len(self.get_portfolios()) == 0:
+            raise ValueError("At least one portfolio is required for comparison.")
+        if not all(isinstance(portfolio, Portfolio) for portfolio in self.get_portfolios()):
+            raise ValueError("All portfolios must be instances of the Portfolio class.")
+
+        for portfolio in self.get_portfolios():
+            for portfolio_asset in portfolio.get_assets():
+                asset = portfolio_asset.get_asset()
+                asset_date_range = asset.get_date_range()
+
+                if not any(
+                    date_range.get_start_date() >= asset_date_range.get_start_date() and
+                    date_range.get_end_date() <= asset_date_range.get_end_date()
+                    for date_range in self.get_date_ranges()
+                ):
+                    raise ValueError(f"Asset '{asset.get_code()}' in portfolio '{portfolio.get_title()}' does not contain data for some dates from the asked date range.")
+
+        return True

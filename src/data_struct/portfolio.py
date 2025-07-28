@@ -35,6 +35,15 @@ class Portfolio:
         return self.assets
 
     def _check_validity(self) -> bool:
+        if not self.get_title():
+            raise ValueError("Portfolio title cannot be empty.")
+        if not isinstance(self.get_title(), str):
+            raise ValueError("Portfolio title must be a string.")
+        if not self.get_assets() or len(self.get_assets()) == 0:
+            raise ValueError("Portfolio must have at least one asset.")
+        if not all(isinstance(asset, PortfolioAsset) for asset in self.get_assets()):
+            raise ValueError("All assets must be instances of the PortfolioAsset class.")
+
         total_weight = sum(asset.get_weight() for asset in self.get_assets())
         if total_weight != 1.0:
             raise ValueError(f"Total weight of assets in portfolio '{self.get_title()}' must equal 1.0, but is {total_weight}.")
