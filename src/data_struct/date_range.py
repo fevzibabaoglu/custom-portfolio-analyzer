@@ -29,8 +29,16 @@ class DateRange:
     def get_start_date(self) -> date:
         return self.start_date
 
+    def set_start_date(self, start_date: date):
+        self.start_date = start_date
+        self._check_validity()
+
     def get_end_date(self) -> date:
         return self.end_date
+
+    def set_end_date(self, end_date: date):
+        self.end_date = end_date
+        self._check_validity()
 
     def _check_validity(self) -> bool:
         if not self.get_start_date():

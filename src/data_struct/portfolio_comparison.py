@@ -56,17 +56,4 @@ class PortfolioComparison:
             raise ValueError("Portfolios must be a list.")
         if not all(isinstance(portfolio, Portfolio) for portfolio in self.get_portfolios()):
             raise ValueError("All portfolios must be instances of the Portfolio class.")
-
-        for portfolio in self.get_portfolios():
-            for portfolio_asset in portfolio.get_assets():
-                asset = portfolio_asset.get_asset()
-                asset_date_range = asset.get_date_range()
-
-                if not any(
-                    date_range.get_start_date() >= asset_date_range.get_start_date() and
-                    date_range.get_end_date() <= asset_date_range.get_end_date()
-                    for date_range in self.get_date_ranges()
-                ):
-                    raise ValueError(f"Asset '{asset.get_code()}' in portfolio '{portfolio.get_title()}' does not contain data for some dates from the asked date range.")
-
         return True
