@@ -17,25 +17,29 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 """
 
 
-from .asset import Asset
-from .date_range import DateRange
-from .performance_asset import PerformanceAsset
-from .performance_portfolio_comparison import PerformancePortfolioComparison
-from .portfolio_asset import PortfolioAsset
-from .portfolio_comparison import PortfolioComparison
-from .portfolio import Portfolio
-from .price import Price
-from .date_utils import DateUtils
+from datetime import datetime, date
 
 
-__all__ = [
-    "Asset",
-    "DateRange",
-    "PerformanceAsset",
-    "PerformancePortfolioComparison",
-    "PortfolioAsset",
-    "PortfolioComparison",
-    "Portfolio",
-    "Price",
-    "DateUtils",
-]
+class DateUtils:
+    DATE_FORMAT = "%d.%m.%Y"
+
+    @classmethod
+    def set_date_format(cls, date_format: str):
+        cls.DATE_FORMAT = date_format
+
+    @classmethod
+    def get_date_format(cls) -> str:
+        return cls.DATE_FORMAT
+
+
+    @staticmethod
+    def parse_date(date_str: str) -> date:
+        return datetime.strptime(date_str, DateUtils.DATE_FORMAT).date()
+
+    @staticmethod
+    def format_date(date_obj: date) -> str:
+        return date_obj.strftime(DateUtils.DATE_FORMAT)
+
+    @staticmethod
+    def get_today() -> date:
+        return date.today()

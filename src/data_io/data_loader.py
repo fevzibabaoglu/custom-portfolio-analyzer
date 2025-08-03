@@ -20,19 +20,20 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 import ast
 import json
 import pandas as pd
-from datetime import datetime
 from typing import List
 
-from data_struct import Asset, DateRange, PortfolioAsset, PortfolioComparison, Portfolio, Price
+from data_struct import (
+    Asset,
+    DateRange,
+    PortfolioAsset,
+    PortfolioComparison,
+    Portfolio,
+    Price,
+    DateUtils,
+)
 
 
 class DataLoader:
-    DATE_FORMAT = "%d.%m.%Y"
-
-    @classmethod
-    def set_date_format(cls, date_format: str):
-        cls.date_format = date_format
-
     def __init__(
         self,
         asset_data_path = 'data/asset_data.csv',
@@ -63,9 +64,9 @@ class DataLoader:
             price_chart = ast.literal_eval(price_chart_str)
             prices = [
                 Price(
-                    datetime.strptime(date, self.DATE_FORMAT).date(),
-                    value,
-                ) 
+                    date=DateUtils.parse_date(date),
+                    value=value,
+                )
                 for date, value in price_chart
             ]
 
@@ -102,14 +103,14 @@ class DataLoader:
             end_date_str = item['end']
 
             if start_date_str.lower() == 'today':
-                start_date = datetime.today().date()
+                start_date = DateUtils.get_today()
             else:
-                start_date = datetime.strptime(start_date_str, self.DATE_FORMAT).date()
+                start_date = DateUtils.parse_date(start_date_str)
 
             if end_date_str.lower() == 'today':
-                end_date = datetime.today().date()
+                end_date = DateUtils.get_today()
             else:
-                end_date = datetime.strptime(end_date_str, self.DATE_FORMAT).date()
+                end_date = DateUtils.parse_date(end_date_str)
 
             date_range = DateRange(start_date=start_date, end_date=end_date)
             date_ranges.append(date_range)

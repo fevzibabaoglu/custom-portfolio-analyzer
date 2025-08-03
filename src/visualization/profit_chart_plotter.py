@@ -23,16 +23,10 @@ from matplotlib.dates import DateFormatter
 from matplotlib.ticker import PercentFormatter
 from typing import List
 
-from data_struct import PerformancePortfolioComparison
+from data_struct import PerformancePortfolioComparison, DateUtils
 
 
 class ProfitChartPlotter:
-    date_format = "%d.%m.%Y"
-
-    @classmethod
-    def set_date_format(cls, date_format: str):
-        cls.date_format = date_format
-
     def __init__(self, performance_portfolio_comparisons: List[PerformancePortfolioComparison]):
         self.performance_portfolio_comparisons = performance_portfolio_comparisons
         self._check_validity()
@@ -59,7 +53,7 @@ class ProfitChartPlotter:
 
             # Format the plot
             ax.set_title(
-                f"Profit Ratios: {start_date.strftime(self.date_format)} to {end_date.strftime(self.date_format)}",
+                f"Profit Ratios: {DateUtils.format_date(start_date)} to {DateUtils.format_date(end_date)}",
                 fontsize=14,
                 weight='bold',
             )
@@ -68,7 +62,7 @@ class ProfitChartPlotter:
             ax.yaxis.set_major_formatter(PercentFormatter(xmax=1.0))
 
             # Format x-axis ticks as dd.mm.yyyy
-            ax.xaxis.set_major_formatter(DateFormatter(self.date_format))
+            ax.xaxis.set_major_formatter(DateFormatter(DateUtils.get_date_format()))
             ax.xaxis.set_major_locator(mdates.AutoDateLocator())
 
             ax.grid(True, which='major', axis='y', linestyle='--', alpha=0.5)

@@ -19,10 +19,10 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 import argparse
 import logging
-from datetime import date
 
 from analyze import analyzer
 from data_io import DataLoader
+from data_struct import DateUtils
 from visualization import ProfitChartPlotter
 
 
@@ -39,7 +39,7 @@ logging.basicConfig(
 def validate_date_format(fmt: str) -> str:
     """Validate that the date format is usable with strftime/strptime."""
     try:
-        date.today().strftime(fmt)
+        DateUtils.get_today().strftime(fmt)
         return fmt
     except Exception as e:
         raise argparse.ArgumentTypeError(f"Invalid date format: {fmt}. Error: {e}")
@@ -69,8 +69,7 @@ def main():
     args = parser.parse_args()
 
     # Set the date format for classes
-    ProfitChartPlotter.set_date_format(args.date_format)
-    DataLoader.set_date_format(args.date_format)
+    DateUtils.set_date_format(args.date_format)
 
     loader = DataLoader(
         asset_data_path=args.asset_data_path,
