@@ -60,14 +60,14 @@ class DataLoader:
             code = str(row['code']).strip()
             name = str(row['name']).strip()
 
-            price_chart_str = row['price_chart']
-            price_chart = ast.literal_eval(price_chart_str)
+            price_list_str = row['prices']
+            price_list = ast.literal_eval(price_list_str)
             prices = [
                 Price(
-                    date=DateUtils.parse_date(date),
-                    value=value,
+                    date=DateUtils.parse_date(price_dict['date']),
+                    value=price_dict['value'],
                 )
-                for date, value in price_chart
+                for price_dict in price_list
             ]
 
             asset = Asset(code=code, name=name, prices=prices)
