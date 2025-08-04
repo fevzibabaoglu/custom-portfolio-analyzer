@@ -23,8 +23,9 @@ from .asset import Asset
 
 
 class PerformanceAsset:
-    def __init__(self, asset: Asset):
+    def __init__(self, asset: Asset, is_set_default: bool = False):
         self.asset = asset
+        self._is_set_default = is_set_default
         self._check_validity()
 
         self.profit_ratios = self.calculate_profit_ratios()
@@ -32,8 +33,14 @@ class PerformanceAsset:
     def get_asset(self) -> Asset:
         return self.asset
 
+    def is_set_default(self) -> bool:
+        return self._is_set_default
+
     def get_profit_ratios(self) -> List[float]:
         return self.profit_ratios
+
+    def set_profit_ratios(self, profit_ratios: List[float]):
+        self.profit_ratios = profit_ratios
 
     def calculate_profit_ratios(self) -> List[float]:
         prices = [price.get_value() for price in self.asset.get_prices()]
@@ -45,4 +52,8 @@ class PerformanceAsset:
             raise ValueError("Asset cannot be empty.")
         if not isinstance(self.asset, Asset):
             raise ValueError("Asset must be an instance of the Asset class.")
+        if self.is_set_default() is None:
+            raise ValueError("is_set_default cannot be empty.")
+        if not isinstance(self.is_set_default(), bool):
+            raise ValueError("is_set_default must be a boolean.")
         return True

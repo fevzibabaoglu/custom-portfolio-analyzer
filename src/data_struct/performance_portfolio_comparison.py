@@ -18,6 +18,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 
 import logging
+import numpy as np
 from typing import List
 
 from .date_range import DateRange
@@ -52,6 +53,7 @@ class PerformancePortfolioComparison:
         return True
 
     def _post_process(self):
+        # Adjust the date range based on the assets' date ranges
         for performance_asset in self.get_performance_assets():
             asset = performance_asset.get_asset()
             asset_date_range = asset.get_date_range()
@@ -75,3 +77,18 @@ class PerformancePortfolioComparison:
                     f"to {DateUtils.format_date(end_date)}"
                 )
                 self.get_date_range().set_end_date(end_date)
+
+        # Compare with the default portfolio
+        default_performance_asset = next((
+            performance_asset for performance_asset in self.get_performance_assets()
+            if performance_asset.is_set_default()
+        ), None)
+        if default_performance_asset:
+            default_profit_ratios = default_performance_asset.get_profit_ratios()
+
+            for performance_asset in self.get_performance_assets():
+                compared_profit_ratios = np.subtract(
+                    performance_asset.get_profit_ratios(),
+                    default_profit_ratios,
+                ).tolist()
+                performance_asset.set_profit_ratios(compared_profit_ratios)

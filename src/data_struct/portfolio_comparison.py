@@ -56,4 +56,6 @@ class PortfolioComparison:
             raise ValueError("Portfolios must be a list.")
         if not all(isinstance(portfolio, Portfolio) for portfolio in self.get_portfolios()):
             raise ValueError("All portfolios must be instances of the Portfolio class.")
+        if sum(p.is_set_default() for p in self.get_portfolios()) > 1:
+            raise ValueError("Only one portfolio can be set as default.")
         return True

@@ -74,7 +74,10 @@ class PortfolioPerformanceGenerator:
             prices=portfolio_performance_prices,
         )
 
-        return PerformanceAsset(portfolio_performance_asset)
+        return PerformanceAsset(
+            asset=portfolio_performance_asset,
+            is_set_default=self.portfolio.is_set_default(),
+        )
 
     def _static_allocation_performance_index(
         self,

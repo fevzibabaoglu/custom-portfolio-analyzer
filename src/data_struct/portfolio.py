@@ -23,9 +23,10 @@ from .portfolio_asset import PortfolioAsset
 
 
 class Portfolio:
-    def __init__(self, title: str, assets: List[PortfolioAsset]):
+    def __init__(self, title: str, assets: List[PortfolioAsset], is_set_default: bool = False):
         self.title = title
         self.assets = assets
+        self._is_set_default = is_set_default
         self._check_validity()
 
     def get_title(self) -> str:
@@ -33,6 +34,9 @@ class Portfolio:
 
     def get_assets(self) -> List[PortfolioAsset]:
         return self.assets
+
+    def is_set_default(self) -> bool:
+        return self._is_set_default
 
     def _check_validity(self) -> bool:
         if not self.get_title():
@@ -45,6 +49,10 @@ class Portfolio:
             raise ValueError("Assets must be a list.")
         if not all(isinstance(asset, PortfolioAsset) for asset in self.get_assets()):
             raise ValueError("All assets must be instances of the PortfolioAsset class.")
+        if self.is_set_default() is None:
+            raise ValueError("is_set_default cannot be empty.")
+        if not isinstance(self.is_set_default(), bool):
+            raise ValueError("is_set_default must be a boolean.")
 
         total_weight = sum(asset.get_weight() for asset in self.get_assets())
         if total_weight != 1.0:

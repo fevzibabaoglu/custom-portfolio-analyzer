@@ -48,7 +48,7 @@ class ProfitChartPlotter:
                 dates = [price.get_date() for price in prices]
                 profit_ratios = performance_asset.get_profit_ratios()
 
-                label = f"{asset.get_name()} ({asset.get_code()})"
+                label = f"{asset.get_name()} ({asset.get_code()}){' [Default]' if performance_asset.is_set_default() else ''}"
                 ax.plot(dates, profit_ratios, label=label, linewidth=2)
 
             # Format the plot
@@ -66,7 +66,7 @@ class ProfitChartPlotter:
             ax.xaxis.set_major_locator(mdates.AutoDateLocator())
 
             ax.grid(True, which='major', axis='y', linestyle='--', alpha=0.5)
-            ax.legend(title="Assets", loc='upper left', fontsize=10)
+            ax.legend(title="Assets", fontsize=10)
             plt.tight_layout()
             plt.show()
 

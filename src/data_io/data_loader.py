@@ -123,8 +123,9 @@ class DataLoader:
         for item in portfolio_data:
             title = item['title']
             assets = self._load_portfolio_assets(item['assets'])
+            is_set_default = item.get('set_default', False)
 
-            portfolio = Portfolio(title=title, assets=assets)
+            portfolio = Portfolio(title=title, assets=assets, is_set_default=is_set_default)
             portfolios.append(portfolio)
 
         return portfolios
