@@ -1,4 +1,4 @@
 code,name,price_chart
-fund_1,fund_name_1,"[('02.01.2025',price_1_1),('28.07.2025',price_1_2)]"
-fund_2,fund_name_2,"[('02.01.2025',price_2_1),('28.07.2025',price_2_2)]"
-fund_3,fund_name_3,"[('02.01.2025',price_3_1),('28.07.2025',price_3_2)]"
+fund_1,fund_name_1,"{'date':'02.01.2025','value':price_1_1},{'date':'04.08.2025','value':price_1_2}"
+fund_2,fund_name_2,"{'date':'02.01.2025','value':price_2_1},{'date':'28.07.2025','value':price_2_2}"
+fund_3,fund_name_3,"{'date':'02.01.2025','value':price_3_1},{'date':'28.07.2025','value':price_3_2}"

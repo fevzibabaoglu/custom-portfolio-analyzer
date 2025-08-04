@@ -19,6 +19,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 from .asset import Asset
 from .date_range import DateRange
+from .date_utils import DateUtils
 from .performance_asset import PerformanceAsset
 from .performance_portfolio_comparison import PerformancePortfolioComparison
 from .portfolio_asset import PortfolioAsset
@@ -30,6 +31,7 @@ from .price import Price
 __all__ = [
     "Asset",
     "DateRange",
+    "DateUtils",
     "PerformanceAsset",
     "PerformancePortfolioComparison",
     "PortfolioAsset",

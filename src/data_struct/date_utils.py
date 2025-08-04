@@ -17,12 +17,29 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 """
 
 
-from setuptools import setup, find_packages
+from datetime import datetime, date
 
 
-setup(
-    name="custom-portfolio-analyzer",
-    version="1.1.0",
-    packages=find_packages(where="src"),
-    package_dir={"": "src"},
-)
+class DateUtils:
+    DATE_FORMAT = "%d.%m.%Y"
+
+    @classmethod
+    def set_date_format(cls, date_format: str):
+        cls.DATE_FORMAT = date_format
+
+    @classmethod
+    def get_date_format(cls) -> str:
+        return cls.DATE_FORMAT
+
+
+    @staticmethod
+    def parse_date(date_str: str) -> date:
+        return datetime.strptime(date_str, DateUtils.DATE_FORMAT).date()
+
+    @staticmethod
+    def format_date(date_obj: date) -> str:
+        return date_obj.strftime(DateUtils.DATE_FORMAT)
+
+    @staticmethod
+    def get_today() -> date:
+        return date.today()

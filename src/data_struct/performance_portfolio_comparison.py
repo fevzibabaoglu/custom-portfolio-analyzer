@@ -17,9 +17,12 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 """
 
 
+import logging
+import numpy as np
 from typing import List
 
 from .date_range import DateRange
+from .date_utils import DateUtils
 from .performance_asset import PerformanceAsset
 
 
@@ -28,6 +31,7 @@ class PerformancePortfolioComparison:
         self.date_range = date_range
         self.performance_assets = performance_assets
         self._check_validity()
+        self._post_process()
 
     def get_date_range(self) -> DateRange:
         return self.date_range
@@ -47,3 +51,44 @@ class PerformancePortfolioComparison:
         if not all(isinstance(asset, PerformanceAsset) for asset in self.performance_assets):
             raise ValueError("All performance assets must be instances of the PerformanceAsset class.")
         return True
+
+    def _post_process(self):
+        # Adjust the date range based on the assets' date ranges
+        for performance_asset in self.get_performance_assets():
+            asset = performance_asset.get_asset()
+            asset_date_range = asset.get_date_range()
+
+            comparison_start_date = self.get_date_range().get_start_date()
+            start_date = max(comparison_start_date, asset_date_range.get_start_date())
+            if start_date != comparison_start_date:
+                logging.info(
+                    f"Adjusting start date for {asset.get_code()} "
+                    f"from {DateUtils.format_date(comparison_start_date)} "
+                    f"to {DateUtils.format_date(start_date)}"
+                )
+                self.get_date_range().set_start_date(start_date)
+
+            comparison_end_date = self.get_date_range().get_end_date()
+            end_date = min(comparison_end_date, asset_date_range.get_end_date())
+            if end_date != comparison_end_date:
+                logging.info(
+                    f"Adjusting end date for {asset.get_code()} "
+                    f"from {DateUtils.format_date(comparison_end_date)} "
+                    f"to {DateUtils.format_date(end_date)}"
+                )
+                self.get_date_range().set_end_date(end_date)
+
+        # Compare with the default portfolio
+        default_performance_asset = next((
+            performance_asset for performance_asset in self.get_performance_assets()
+            if performance_asset.is_set_default()
+        ), None)
+        if default_performance_asset:
+            default_profit_ratios = default_performance_asset.get_profit_ratios()
+
+            for performance_asset in self.get_performance_assets():
+                compared_profit_ratios = np.subtract(
+                    performance_asset.get_profit_ratios(),
+                    default_profit_ratios,
+                ).tolist()
+                performance_asset.set_profit_ratios(compared_profit_ratios)

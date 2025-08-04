@@ -20,19 +20,20 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 import ast
 import json
 import pandas as pd
-from datetime import datetime
 from typing import List
 
-from data_struct import Asset, DateRange, PortfolioAsset, PortfolioComparison, Portfolio, Price
+from data_struct import (
+    Asset,
+    DateRange,
+    DateUtils,
+    PortfolioAsset,
+    PortfolioComparison,
+    Portfolio,
+    Price,
+)
 
 
 class DataLoader:
-    DATE_FORMAT = "%d.%m.%Y"
-
-    @classmethod
-    def set_date_format(cls, date_format: str):
-        cls.date_format = date_format
-
     def __init__(
         self,
         asset_data_path = 'data/asset_data.csv',
@@ -59,14 +60,14 @@ class DataLoader:
             code = str(row['code']).strip()
             name = str(row['name']).strip()
 
-            price_chart_str = row['price_chart']
-            price_chart = ast.literal_eval(price_chart_str)
+            price_list_str = row['prices']
+            price_list = ast.literal_eval(price_list_str)
             prices = [
                 Price(
-                    datetime.strptime(date, self.DATE_FORMAT).date(),
-                    value,
-                ) 
-                for date, value in price_chart
+                    date=DateUtils.parse_date(price_dict['date']),
+                    value=price_dict['value'],
+                )
+                for price_dict in price_list
             ]
 
             asset = Asset(code=code, name=name, prices=prices)
@@ -102,14 +103,14 @@ class DataLoader:
             end_date_str = item['end']
 
             if start_date_str.lower() == 'today':
-                start_date = datetime.today().date()
+                start_date = DateUtils.get_today()
             else:
-                start_date = datetime.strptime(start_date_str, self.DATE_FORMAT).date()
+                start_date = DateUtils.parse_date(start_date_str)
 
             if end_date_str.lower() == 'today':
-                end_date = datetime.today().date()
+                end_date = DateUtils.get_today()
             else:
-                end_date = datetime.strptime(end_date_str, self.DATE_FORMAT).date()
+                end_date = DateUtils.parse_date(end_date_str)
 
             date_range = DateRange(start_date=start_date, end_date=end_date)
             date_ranges.append(date_range)
@@ -122,8 +123,9 @@ class DataLoader:
         for item in portfolio_data:
             title = item['title']
             assets = self._load_portfolio_assets(item['assets'])
+            is_set_default = item.get('set_default', False)
 
-            portfolio = Portfolio(title=title, assets=assets)
+            portfolio = Portfolio(title=title, assets=assets, is_set_default=is_set_default)
             portfolios.append(portfolio)
 
         return portfolios
