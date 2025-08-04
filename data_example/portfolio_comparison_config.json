@@ -11,7 +11,8 @@
                 "assets": [
                     {"code": "fund_1", "weight": 0.6},
                     {"code": "fund_2", "weight": 0.4}
-                ]
+                ],
+                "set_default": true
             },
             {
                 "title": "Test Portfolio 2",
