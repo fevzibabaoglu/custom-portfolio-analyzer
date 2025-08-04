@@ -36,12 +36,12 @@ class PortfolioPerformanceGenerator:
     def generate_performance_asset(self) -> PerformanceAsset:
         portfolio_performance_prices: List[Price] = []
 
-        # Get assets and their weights from the portfolio
-        asset_weight_tuples = [
-            (asset.get_asset(), asset.get_weight())
+        # Get assets, their weights and withholding tax rates from the portfolio
+        asset_data_tuples = [
+            (asset.get_asset(), asset.get_weight(), asset.get_withholding_tax_rate())
             for asset in self.portfolio.get_assets()
         ]
-        assets, weights = map(list, zip(*asset_weight_tuples))
+        assets, weights, withholding_tax_rates = map(list, zip(*asset_data_tuples))
 
         # Get the price history for each asset over the given date range
         asset_prices_list = [
@@ -56,8 +56,9 @@ class PortfolioPerformanceGenerator:
         for prices_on_date in prices_by_date:
             sapi = self._static_allocation_performance_index(
                 weights=weights,
+                withholding_tax_rates=withholding_tax_rates,
                 initial_prices=[price.get_value() for price in initial_prices],
-                final_prices=[price.get_value() for price in prices_on_date]
+                final_prices=[price.get_value() for price in prices_on_date],
             )
 
             portfolio_performance_price = Price(
@@ -82,16 +83,19 @@ class PortfolioPerformanceGenerator:
     def _static_allocation_performance_index(
         self,
         weights: List[float],
+        withholding_tax_rates: List[float],
         initial_prices: List[float],
-        final_prices: List[float]
+        final_prices: List[float],
     ) -> float:
         """Calculate the performance index of the portfolio based on static allocation."""
-        if len(weights) != len(initial_prices) or len(weights) != len(final_prices):
-            raise ValueError("Weights, initial prices, and final prices must have the same amount of elements.")
+        if len({
+            len(weights), len(withholding_tax_rates), len(initial_prices), len(final_prices),
+        }) != 1:
+            raise ValueError("Weights, withholding tax rates, initial prices, and final prices must have the same amount of elements.")
 
         nominator = sum(
-            weight * final_price / initial_price
-            for weight, initial_price, final_price in zip(weights, initial_prices, final_prices)
+            weight * ((final / initial) * (1 - tax) + tax if final > initial else final / initial)
+            for weight, tax, initial, final in zip(weights, withholding_tax_rates, initial_prices, final_prices)
         )
 
         denominator = sum(
