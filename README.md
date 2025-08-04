@@ -7,7 +7,7 @@ A Python tool to model, back-test, and compare the performance of custom investm
 
 The tool operates based on two main input files:
 
-1.  **An asset data CSV**: This file acts as the database for your assets (e.g., funds, stocks). It stores the name, a unique code, and the historical price chart for each asset.
+1.  **An asset data CSV**: This file acts as the database for your assets (e.g., funds, stocks). It stores the name, a unique code, and the historical prices for each asset.
 
 2.  **A portfolio configuration JSON**: This file defines the analysis scenarios. Here, you specify one or more comparisons scenarios, each containing the portfolios to be analyzed and compared, and the date ranges for back-testing.
 
@@ -19,7 +19,7 @@ The script reads these files, calculates the performance of each portfolio for e
 The core of the analysis is the Static Allocation Performance Index. This formula calculates the value of a portfolio at a given point in time, assuming a fixed (static) allocation of assets. It measures the weighted average performance of the individual assets relative to their starting prices.
 
 $$
-\text{SAPI} = \frac{\sum_{i} \left( w_i \cdot \frac{P_{i}}{P_{i0}} \right)}{\sum_{i} \left( \frac{w_i}{P_{i0}} \right)}
+\text{SAPI} = \frac{\sum_{i} \left( w_i \cdot \frac{P_{i}}{P_{i0}} \right)}{\sum_{i} \left( w_i \cdot \frac{1}{P_{i0}} \right)}
 $$
 
 Where:
@@ -42,6 +42,8 @@ The data for this file needs to be gathered from an external source. My another 
 ### Portfolio Configuration
 
 This file is a list of comparison scenarios. Each scenario defines the portfolios you want to compare and the time periods for the analysis. For a detailed example of the required structure, please see the **[portfolio_comparison_config.json](./data_example/portfolio_comparison_config.json)** file.
+
+**Note:** The `set_default` field is optional and defaults to `false`. It should be explicitly set to `true` for only one portfolio within a scenario. When provided, it marks that portfolio as the baseline, and all comparisons will be made relative to it. If omitted, no baseline portfolio is assumed.
 
 
 ## How to Run
@@ -73,7 +75,7 @@ You can customize the file paths and date display format using the following arg
 *   `--config-path`: Path to your portfolio configuration JSON file.
     *   Default: `data/portfolio_comparison_config.json`
 *   `--date-format`: The format for displaying dates on the chart axes (must be a valid Python `strftime` format).
-    *   Default: `%d.%m.%Y`
+    *   Default: `%d.%m.%Y` (Keep as default for `TEFAS Fund Data Exporter` compatibility)
 
 *Example with arguments:*
 ```shell
