@@ -9,17 +9,17 @@
             {
                 "title": "Test Portfolio 1",
                 "assets": [
-                    {"code": "fund_1", "weight": 0.6},
-                    {"code": "fund_2", "weight": 0.4}
+                    {"code": "fund_1", "weight": 0.6, "withholding_tax_rate": 0.15},
+                    {"code": "fund_2", "weight": 0.4, "withholding_tax_rate": 0.15}
                 ],
                 "set_default": true
             },
             {
                 "title": "Test Portfolio 2",
                 "assets": [
-                    {"code": "fund_1", "weight": 0.5},
-                    {"code": "fund_2", "weight": 0.3},
-                    {"code": "fund_3", "weight": 0.2}
+                    {"code": "fund_1", "weight": 0.5, "withholding_tax_rate": 0.15},
+                    {"code": "fund_2", "weight": 0.3, "withholding_tax_rate": 0.15},
+                    {"code": "fund_3", "weight": 0.2, "withholding_tax_rate": 0.0}
                 ]
             }
         ]
