@@ -20,19 +20,19 @@ The core of this analyzer is the Static Allocation Performance Index (SAPI), a c
 
 The *applicable tax rate* ($\tilde{t}_i$) is equal to the asset's withholding tax rate ($t_i$) only if the asset made profit. If there is no profit, no tax is applied.
 
-$$
+```math
 \tilde{t}_i =
 \begin{cases}
 t_i, & \text{if } P_i > P_{i0} \\
 0, & \text{otherwise}
 \end{cases}
-$$
+```
 
 With the applicable tax rate determined, the main SAPI formula calculates a unified index value for the entire portfolio.
 
-$$
+```math
 \text{SAPI} = \frac{\sum_{i} \left( w_i \cdot \left[ \frac{P_i}{P_{i0}} \cdot (1 - \tilde{t}_i) + \tilde{t}_i \right] \right)}{\sum_{i} \left( \frac{w_i}{P_{i0}} \right)}
-$$
+```
 
 In simple terms:
 *   The **numerator** represents the total, tax-adjusted value of the portfolio.
