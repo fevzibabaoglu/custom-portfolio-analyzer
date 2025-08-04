@@ -16,19 +16,37 @@ The script reads these files, calculates the performance of each portfolio for e
 
 ### Static Allocation Performance Index
 
-The core of the analysis is the Static Allocation Performance Index. This formula calculates the value of a portfolio at a given point in time, assuming a fixed (static) allocation of assets. It measures the weighted average performance of the individual assets relative to their starting prices.
+The core of this analyzer is the Static Allocation Performance Index (SAPI), a custom formula designed to back-test a portfolio's performance. It models real-world returns by calculating a unified index value for the entire portfolio.
 
-$$
-\text{SAPI} = \frac{\sum_{i} \left( w_i \cdot \frac{P_{i}}{P_{i0}} \right)}{\sum_{i} \left( w_i \cdot \frac{1}{P_{i0}} \right)}
-$$
+The *applicable tax rate* ($\tilde{t}_i$) is equal to the asset's withholding tax rate ($t_i$) only if the asset made profit. If there is no profit, no tax is applied.
+
+```math
+\tilde{t}_i =
+\begin{cases}
+t_i, & \text{if } P_i > P_{i0} \\
+0, & \text{otherwise}
+\end{cases}
+```
+
+With the applicable tax rate determined, the main SAPI formula calculates a unified index value for the entire portfolio.
+
+```math
+\text{SAPI} = \frac{\sum_{i} \left( w_i \cdot \left[ \frac{P_i}{P_{i0}} \cdot (1 - \tilde{t}_i) + \tilde{t}_i \right] \right)}{\sum_{i} \left( \frac{w_i}{P_{i0}} \right)}
+```
+
+In simple terms:
+*   The **numerator** represents the total, tax-adjusted value of the portfolio.
+*   The **denominator** is a normalizing factor. It represents the portfolio's initial cost basis, ensuring that the SAPI provides a clean, comparable index value over time.
 
 Where:
 
-*   **`SAPI`** is the Static Allocation Performance Index value.
-*   $w_i$ is the weight (allocation) of asset *i* in terms of money.
-*   $P_{i0}$ is the initial price of asset *i* at the beginning of the date range.
-*   $P_{i}$ is the price of asset *i* on each subsequent day within the analysis period.
-*   $\sum_{i}$ denotes the sum over all assets (*i*) in the portfolio.
+* **`SAPI`**: The Static Allocation Performance Index value.
+* $w_i$: The weight (allocation) of asset *i* in terms of money.
+* $P_{i0}$: The initial price of asset *i* at the beginning of the analysis period.
+* $P_{i}$: The price of asset *i* on each subsequent day within the analysis period.
+* $t_i$: The withholding tax rate for asset *i*.
+* **$\tilde{t}_i$**: The *applicable* tax rate for asset *i*.
+* $\sum_{i}$: Denotes the sum over all assets (*i*) in the portfolio.
 
 
 ## File Structure & Configuration
@@ -43,7 +61,9 @@ The data for this file needs to be gathered from an external source. My another 
 
 This file is a list of comparison scenarios. Each scenario defines the portfolios you want to compare and the time periods for the analysis. For a detailed example of the required structure, please see the **[portfolio_comparison_config.json](./data_example/portfolio_comparison_config.json)** file.
 
-**Note:** The `set_default` field is optional and defaults to `false`. It should be explicitly set to `true` for only one portfolio within a scenario. When provided, it marks that portfolio as the baseline, and all comparisons will be made relative to it. If omitted, no baseline portfolio is assumed.
+**Note 1:** The `set_default` field is optional and defaults to `false`. It should be explicitly set to `true` for only one portfolio within a scenario. When provided, it marks that portfolio as the baseline, and all comparisons will be made relative to it. If omitted, no baseline portfolio is assumed.
+
+**Note 2:** The `withholding_tax_rate` field for each asset must be set manually. It cannot be retrieved automatically from **[TEFAS Fund Data Exporter](https://github.com/fevzibabaoglu/tefas-data-exporter)**. If no value is provided, the default rate of `0.0` (i.e., no withholding tax) is used.
 
 
 ## How to Run

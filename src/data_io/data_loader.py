@@ -138,9 +138,10 @@ class DataLoader:
                 (a for a in self.asset_data if a.get_code() == item['code']),
                 None
             )
-            weight = item['weight']
+            weight = item.get('weight', None)
+            withholding_tax_rate = item.get('withholding_tax_rate', 0.0) # Default to 0.0
 
-            portfolio_asset = PortfolioAsset(asset=asset, weight=weight)
+            portfolio_asset = PortfolioAsset(asset=asset, weight=weight, withholding_tax_rate=withholding_tax_rate)
             portfolio_assets.append(portfolio_asset)
 
         return portfolio_assets

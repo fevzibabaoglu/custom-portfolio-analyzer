@@ -21,9 +21,10 @@ from .asset import Asset
 
 
 class PortfolioAsset:
-    def __init__(self, asset: Asset, weight: float):
+    def __init__(self, asset: Asset, weight: float, withholding_tax_rate: float):
         self.asset = asset
         self.weight = weight
+        self.withholding_tax_rate = withholding_tax_rate
         self._check_validity()
 
     def get_asset(self) -> Asset:
@@ -31,6 +32,9 @@ class PortfolioAsset:
 
     def get_weight(self) -> float:
         return self.weight
+
+    def get_withholding_tax_rate(self) -> float:
+        return self.withholding_tax_rate
 
     def _check_validity(self) -> bool:
         if not self.get_asset():
@@ -43,4 +47,10 @@ class PortfolioAsset:
             raise ValueError("Weight must be a float number.")
         if not (0 < self.get_weight() <= 1):
             raise ValueError("Weight must be between 0 and 1.")
+        if self.get_withholding_tax_rate() is None:
+            raise ValueError("Withholding tax rate cannot be empty.")
+        if not isinstance(self.get_withholding_tax_rate(), float):
+            raise ValueError("Withholding tax rate must be a float number.")
+        if self.get_withholding_tax_rate() < 0:
+            raise ValueError("Withholding tax rate must be non-negative.")
         return True
