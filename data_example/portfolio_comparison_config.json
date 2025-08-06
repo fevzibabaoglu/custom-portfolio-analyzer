@@ -20,7 +20,8 @@
                     {"code": "fund_1", "weight": 0.5, "withholding_tax_rate": 0.15},
                     {"code": "fund_2", "weight": 0.3, "withholding_tax_rate": 0.15},
                     {"code": "fund_3", "weight": 0.2, "withholding_tax_rate": 0.0}
-                ]
+                ],
+                "disabled": true
             }
         ]
     }

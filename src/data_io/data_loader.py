@@ -121,6 +121,10 @@ class DataLoader:
         portfolios = []
 
         for item in portfolio_data:
+            is_disabled = item.get('disabled', False)
+            if is_disabled:
+                continue
+
             title = item['title']
             assets = self._load_portfolio_assets(item['assets'])
             is_set_default = item.get('set_default', False)
