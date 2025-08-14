@@ -75,16 +75,13 @@ def main():
         asset_data_path=args.asset_data_path,
         comparison_config_path=args.config_path,
     )
-    comparison_configs = loader.get_comparison_configs()
+    comparison_config = loader.get_comparison_config()
 
-    for comparison_config in comparison_configs:
-        logging.info(f"Analyzing portfolio comparison: {comparison_config.get_title()}")
+    analyzer_instance = analyzer.Analyzer(comparison_config)
+    performance_portfolio_comparisons = analyzer_instance.get_performance_portfolio_comparison_list()
 
-        analyzer_instance = analyzer.Analyzer(comparison_config)
-        performance_portfolio_comparisons = analyzer_instance.get_performance_portfolio_comparison_list()
-
-        plotter = ProfitChartPlotter(performance_portfolio_comparisons=performance_portfolio_comparisons)
-        plotter.plot_charts()
+    plotter = ProfitChartPlotter(performance_portfolio_comparisons=performance_portfolio_comparisons)
+    plotter.plot_charts()
 
 
 if __name__ == '__main__':

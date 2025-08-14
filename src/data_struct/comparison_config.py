@@ -24,14 +24,10 @@ from .portfolio import Portfolio
 
 
 class ComparisonConfig:
-    def __init__(self,  title: str, date_ranges: List[DateRange], portfolios: List[Portfolio]):
-        self.title = title
+    def __init__(self, date_ranges: List[DateRange], portfolios: List[Portfolio]):
         self.date_ranges = date_ranges
         self.portfolios = portfolios
         self._check_validity()
-
-    def get_title(self) -> str:
-        return self.title
 
     def get_date_ranges(self) -> List[DateRange]:
         return self.date_ranges
@@ -40,10 +36,6 @@ class ComparisonConfig:
         return self.portfolios
 
     def _check_validity(self) -> bool:
-        if not self.get_title():
-            raise ValueError("Comparison title cannot be empty.")
-        if not isinstance(self.get_title(), str):
-            raise ValueError("Comparison title must be a string.")
         if not self.get_date_ranges():
             raise ValueError("Date ranges cannot be empty.")
         if not isinstance(self.get_date_ranges(), list):
