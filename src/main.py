@@ -22,7 +22,7 @@ import logging
 
 from analyze import analyzer
 from data_io import DataLoader
-from data_struct import DateUtils
+from utils import DateUtils
 from visualization import ProfitChartPlotter
 
 

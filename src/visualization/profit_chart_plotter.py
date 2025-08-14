@@ -23,7 +23,8 @@ from matplotlib.dates import DateFormatter
 from matplotlib.ticker import PercentFormatter
 from typing import List
 
-from data_struct import DateUtils, PerformancePortfolioComparison
+from data_struct import PerformancePortfolioComparison
+from utils import DateUtils
 
 
 class ProfitChartPlotter:

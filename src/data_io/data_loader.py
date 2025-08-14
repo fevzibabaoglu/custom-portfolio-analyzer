@@ -25,12 +25,12 @@ from typing import List
 from data_struct import (
     Asset,
     DateRange,
-    DateUtils,
     PortfolioAsset,
     PortfolioComparison,
     Portfolio,
     Price,
 )
+from utils import DateUtils
 
 
 class DataLoader:

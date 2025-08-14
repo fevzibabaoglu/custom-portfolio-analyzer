@@ -22,8 +22,8 @@ import numpy as np
 from typing import List
 
 from .date_range import DateRange
-from .date_utils import DateUtils
 from .performance_asset import PerformanceAsset
+from utils import DateUtils
 
 
 class PerformancePortfolioComparison:
