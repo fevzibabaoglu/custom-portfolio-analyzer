@@ -23,8 +23,8 @@ from .date_range import DateRange
 from .portfolio import Portfolio
 
 
-class PortfolioComparison:
-    def __init__(self, title:str,  date_ranges: List[DateRange], portfolios: List[Portfolio]):
+class ComparisonConfig:
+    def __init__(self,  title: str, date_ranges: List[DateRange], portfolios: List[Portfolio]):
         self.title = title
         self.date_ranges = date_ranges
         self.portfolios = portfolios

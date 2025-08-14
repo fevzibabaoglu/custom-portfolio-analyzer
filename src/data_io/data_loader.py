@@ -26,7 +26,7 @@ from data_struct import (
     Asset,
     DateRange,
     PortfolioAsset,
-    PortfolioComparison,
+    ComparisonConfig,
     Portfolio,
     Price,
 )
@@ -37,19 +37,19 @@ class DataLoader:
     def __init__(
         self,
         asset_data_path = 'data/asset_data.csv',
-        portfolio_comparison_config_path = 'data/portfolio_comparison_config.json',
+        comparison_config_path = 'data/comparison_config.json',
     ):
         self.asset_data_path = asset_data_path
-        self.portfolio_comparison_config_path = portfolio_comparison_config_path
+        self.comparison_config_path = comparison_config_path
 
         self.asset_data = self.load_asset_data()
-        self.portfolio_comparisons = self.load_portfolio_comparisons()
+        self.comparison_configs = self.load_comparison_configs()
 
     def get_asset_data(self) -> List[Asset]:
         return self.asset_data
 
-    def get_portfolio_comparisons(self) -> List[PortfolioComparison]:
-        return self.portfolio_comparisons
+    def get_comparison_configs(self) -> List[ComparisonConfig]:
+        return self.comparison_configs
 
     def load_asset_data(self) -> List[Asset]:
         assets = []
@@ -75,10 +75,10 @@ class DataLoader:
 
         return assets
 
-    def load_portfolio_comparisons(self) -> List[PortfolioComparison]:
-        portfolio_comparisons = []
+    def load_comparison_configs(self) -> List[ComparisonConfig]:
+        comparison_configs = []
 
-        with open(self.portfolio_comparison_config_path, 'r', encoding='utf-8') as file:
+        with open(self.comparison_config_path, 'r', encoding='utf-8') as file:
             portfolio_comparison_data = json.load(file)
 
         for item in portfolio_comparison_data:
@@ -86,14 +86,14 @@ class DataLoader:
             date_ranges = self._load_date_ranges(item['date_ranges'])
             portfolios = self._load_portfolios(item['portfolios'])
 
-            portfolio_comparison = PortfolioComparison(
+            comparison_config = ComparisonConfig(
                 title=title,
                 date_ranges=date_ranges,
                 portfolios=portfolios,
             )
-            portfolio_comparisons.append(portfolio_comparison)
+            comparison_configs.append(comparison_config)
 
-        return portfolio_comparisons
+        return comparison_configs
 
     def _load_date_ranges(self, date_range_data: List[dict]) -> List[DateRange]:
         date_ranges = []

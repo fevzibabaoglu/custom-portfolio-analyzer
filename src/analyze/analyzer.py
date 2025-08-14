@@ -20,25 +20,25 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 from typing import List
 
 from .portfolio_performance_generator import PortfolioPerformanceGenerator
-from data_struct import PerformancePortfolioComparison, PortfolioComparison
+from data_struct import PerformancePortfolioComparison, ComparisonConfig
 
 
 class Analyzer:
-    def __init__(self, portfolio_comparison: PortfolioComparison):
-        self.portfolio_comparison = portfolio_comparison
+    def __init__(self, comparison_config: ComparisonConfig):
+        self.comparison_config = comparison_config
         self._check_validity()
 
         self.performance_portfolio_comparison_list = self.generate_performance_portfolio_comparison_list()
 
-    def get_portfolio_comparison(self) -> PortfolioComparison:
-        return self.portfolio_comparison
+    def get_comparison_config(self) -> ComparisonConfig:
+        return self.comparison_config
 
     def get_performance_portfolio_comparison_list(self) -> List[PerformancePortfolioComparison]:
         return self.performance_portfolio_comparison_list
 
     def generate_performance_portfolio_comparison_list(self) -> List[PerformancePortfolioComparison]:
-        data_ranges = self.portfolio_comparison.get_date_ranges()
-        portfolios = self.portfolio_comparison.get_portfolios()
+        data_ranges = self.get_comparison_config().get_date_ranges()
+        portfolios = self.get_comparison_config().get_portfolios()
 
         performance_portfolio_comparison_list = []
 
@@ -62,8 +62,8 @@ class Analyzer:
         return performance_portfolio_comparison_list
 
     def _check_validity(self) -> bool:
-        if not self.portfolio_comparison:
-            raise ValueError("Portfolio comparison cannot be empty.")
-        if not isinstance(self.portfolio_comparison, PortfolioComparison):
-            raise ValueError("Portfolio comparison must be an instance of the PortfolioComparison class.")
+        if not self.comparison_config:
+            raise ValueError("Comparison config cannot be empty.")
+        if not isinstance(self.comparison_config, ComparisonConfig):
+            raise ValueError("Comparison config must be an instance of the ComparisonConfig class.")
         return True

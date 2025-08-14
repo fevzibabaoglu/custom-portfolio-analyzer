@@ -57,7 +57,7 @@ def main():
     parser.add_argument(
         '--config-path',
         type=str,
-        default='data/portfolio_comparison_config.json',
+        default='data/comparison_config.json',
         help='Path to the portfolio comparison config JSON file',
     )
     parser.add_argument(
@@ -73,14 +73,14 @@ def main():
 
     loader = DataLoader(
         asset_data_path=args.asset_data_path,
-        portfolio_comparison_config_path=args.config_path,
+        comparison_config_path=args.config_path,
     )
-    portfolio_comparisons = loader.get_portfolio_comparisons()
+    comparison_configs = loader.get_comparison_configs()
 
-    for portfolio_comparison in portfolio_comparisons:
-        logging.info(f"Analyzing portfolio comparison: {portfolio_comparison.get_title()}")
+    for comparison_config in comparison_configs:
+        logging.info(f"Analyzing portfolio comparison: {comparison_config.get_title()}")
 
-        analyzer_instance = analyzer.Analyzer(portfolio_comparison)
+        analyzer_instance = analyzer.Analyzer(comparison_config)
         performance_portfolio_comparisons = analyzer_instance.get_performance_portfolio_comparison_list()
 
         plotter = ProfitChartPlotter(performance_portfolio_comparisons=performance_portfolio_comparisons)

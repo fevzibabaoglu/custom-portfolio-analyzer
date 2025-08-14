@@ -22,7 +22,7 @@ from .date_range import DateRange
 from .performance_asset import PerformanceAsset
 from .performance_portfolio_comparison import PerformancePortfolioComparison
 from .portfolio_asset import PortfolioAsset
-from .portfolio_comparison import PortfolioComparison
+from .comparison_config import ComparisonConfig
 from .portfolio import Portfolio
 from .price import Price
 
@@ -33,7 +33,7 @@ __all__ = [
     "PerformanceAsset",
     "PerformancePortfolioComparison",
     "PortfolioAsset",
-    "PortfolioComparison",
+    "ComparisonConfig",
     "Portfolio",
     "Price",
 ]
