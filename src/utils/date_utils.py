@@ -25,6 +25,7 @@ class DateUtils:
 
     @classmethod
     def set_date_format(cls, date_format: str):
+        DateUtils._validate_date_format(date_format)
         cls.DATE_FORMAT = date_format
 
     @classmethod
@@ -45,3 +46,12 @@ class DateUtils:
     @staticmethod
     def get_today() -> date:
         return date.today()
+
+    @staticmethod
+    def _validate_date_format(fmt: str) -> str:
+        """Validate that the date format is usable with strftime/strptime."""
+        try:
+            DateUtils.get_today().strftime(fmt)
+            return fmt
+        except Exception as e:
+            raise ValueError(f"Invalid date format: {fmt}. Error: {e}")
