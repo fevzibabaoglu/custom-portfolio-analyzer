@@ -19,6 +19,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 from typing import List
 
+from .asset import Asset
 from .portfolio_asset import PortfolioAsset
 
 
@@ -37,6 +38,24 @@ class Portfolio:
 
     def is_set_default(self) -> bool:
         return self._is_set_default
+
+    @classmethod
+    def from_dict(cls, data: dict, asset_list: List[Asset]) -> 'Portfolio':
+        title = data.get('title', None)
+        is_set_default = data.get('is_set_default', False)
+
+        asset_data = data.get('assets', None)
+
+        assets = [
+            PortfolioAsset.from_dict(asset, asset_list)
+            for asset in asset_data
+        ] if asset_data else None
+
+        return cls(
+            title=title,
+            assets=assets,
+            is_set_default=is_set_default,
+        )
 
     def _check_validity(self) -> bool:
         if not self.get_title():

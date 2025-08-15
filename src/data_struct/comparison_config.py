@@ -17,8 +17,10 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 """
 
 
+import json
 from typing import List
 
+from .asset import Asset
 from .date_range import DateRange
 from .portfolio import Portfolio
 
@@ -34,6 +36,28 @@ class ComparisonConfig:
 
     def get_portfolios(self) -> List[Portfolio]:
         return self.portfolios
+
+    @classmethod
+    def from_dict(cls, data: dict, asset_list: List[Asset]) -> 'ComparisonConfig':
+        date_ranges_data = data.get('date_ranges', None)
+        date_ranges = [
+            DateRange.from_dict(item)
+            for item in date_ranges_data
+        ] if date_ranges_data else None
+
+        portfolios_data = data.get('portfolios', None)
+        portfolios = [
+            Portfolio.from_dict(item, asset_list)
+            for item in portfolios_data
+        ] if portfolios_data else None
+
+        return cls(date_ranges=date_ranges, portfolios=portfolios)
+
+    @classmethod
+    def from_json(cls, json_path: str, asset_list: List[Asset]) -> 'ComparisonConfig':
+        with open(json_path, 'r', encoding='utf-8') as file:
+            comparison_data = json.load(file)
+        return cls.from_dict(comparison_data, asset_list)
 
     def _check_validity(self) -> bool:
         if not self.get_date_ranges():

@@ -17,10 +17,12 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 """
 
 
+import pandas as pd
 from typing import List, Optional
 
 from .date_range import DateRange
 from .price import Price
+from utils import DataFrameUtils
 
 
 class Asset:
@@ -52,6 +54,33 @@ class Asset:
 
     def get_date_range(self) -> DateRange:
         return self.date_range
+
+    @classmethod
+    def from_dict(cls, data: dict) -> 'Asset':
+        code = data.get("code", None)
+        name = data.get("name", None)
+
+        price_dicts = data.get("prices", None)
+        prices = [
+            Price.from_dict(price)
+            for price in price_dicts
+        ] if price_dicts else None
+
+        return cls(
+            code=code,
+            name=name,
+            prices=prices,
+        )
+
+    @classmethod
+    def from_csv(cls, csv_path: str) -> List['Asset']:
+        df = pd.read_csv(csv_path, encoding="utf-8")
+        df = DataFrameUtils.postprocess_dataframe(df)
+
+        return [
+            cls.from_dict(row)
+            for row in df.to_dict(orient="records")
+        ]
 
     def _check_validity(self) -> bool:
         if not self.get_code():

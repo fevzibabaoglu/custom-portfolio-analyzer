@@ -34,6 +34,8 @@ class DateUtils:
 
     @staticmethod
     def parse_date(date_str: str) -> date:
+        if date_str.lower() == 'today':
+            return DateUtils.get_today()
         return datetime.strptime(date_str, DateUtils.DATE_FORMAT).date()
 
     @staticmethod

@@ -17,6 +17,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 """
 
 
+from .dataframe_utils import DataFrameUtils
 from .date_utils import DateUtils
 
-__all__ = ["DateUtils"]
+__all__ = ["DataFrameUtils", "DateUtils"]

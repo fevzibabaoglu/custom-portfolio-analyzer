@@ -17,6 +17,8 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 """
 
 
+from typing import List
+
 from .asset import Asset
 
 
@@ -35,6 +37,23 @@ class PortfolioAsset:
 
     def get_withholding_tax_rate(self) -> float:
         return self.withholding_tax_rate
+
+    @classmethod
+    def from_dict(cls, data: dict, asset_list: List[Asset]) -> 'PortfolioAsset':
+        weight = data.get('weight', None)
+        withholding_tax_rate = data.get('withholding_tax_rate', None)
+
+        asset_code = data.get('code', None)
+        asset = next(
+            (a for a in asset_list if a.get_code() == asset_code),
+            None,
+        ) if asset_code else None
+
+        return cls(
+            asset=asset,
+            weight=weight,
+            withholding_tax_rate=withholding_tax_rate,
+        )
 
     def _check_validity(self) -> bool:
         if not self.get_asset():

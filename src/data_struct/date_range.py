@@ -19,6 +19,8 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 from datetime import date
 
+from utils import DateUtils
+
 
 class DateRange:
     def __init__(self, start_date: date, end_date: date):
@@ -39,6 +41,16 @@ class DateRange:
     def set_end_date(self, end_date: date):
         self.end_date = end_date
         self._check_validity()
+
+    @classmethod
+    def from_dict(cls, data: dict) -> 'DateRange':
+        start_date_str = data.get("start_date", None)
+        end_date_str = data.get("end_date", None)
+
+        return cls(
+            start_date=DateUtils.parse_date(start_date_str) if start_date_str else None,
+            end_date=DateUtils.parse_date(end_date_str) if end_date_str else None,
+        )
 
     def _check_validity(self) -> bool:
         if not self.get_start_date():

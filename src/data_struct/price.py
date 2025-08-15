@@ -19,6 +19,8 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 from datetime import date
 
+from utils import DateUtils
+
 
 class Price:
     def __init__(self, date: date, value: float):
@@ -31,7 +33,17 @@ class Price:
 
     def get_value(self) -> float:
         return self.value
-    
+
+    @classmethod
+    def from_dict(cls, data: dict):
+        date_str = data.get("date", None)
+        value_str = data.get("value", None)
+
+        return cls(
+            date=DateUtils.parse_date(date_str) if date_str else None,
+            value=float(value_str) if value_str else None,
+        )
+
     def _check_validity(self) -> bool:
         if not self.get_date():
             raise ValueError("Date cannot be empty.")

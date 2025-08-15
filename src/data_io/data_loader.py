@@ -17,124 +17,18 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 """
 
 
-import ast
-import json
-import pandas as pd
 from typing import List
 
-from data_struct import (
-    Asset,
-    DateRange,
-    PortfolioAsset,
-    ComparisonConfig,
-    Portfolio,
-    Price,
-)
-from utils import DateUtils
+from data_struct import Asset, ComparisonConfig
 
 
 class DataLoader:
-    def __init__(
-        self,
-        asset_data_path = 'data/asset_data.csv',
-        comparison_config_path = 'data/comparison_config.json',
-    ):
-        self.asset_data = self.load_asset_data(asset_data_path)
-        self.comparison_config = self.load_comparison_config(comparison_config_path)
+    def __init__(self, asset_data_path: str, comparison_config_path: str):
+        self.assets = Asset.from_csv(asset_data_path)
+        self.comparison_config = ComparisonConfig.from_json(comparison_config_path, self.assets)
 
-    def get_asset_data(self) -> List[Asset]:
-        return self.asset_data
+    def get_assets(self) -> List[Asset]:
+        return self.assets
 
     def get_comparison_config(self) -> ComparisonConfig:
         return self.comparison_config
-
-    def load_asset_data(self, asset_data_path: str) -> List[Asset]:
-        assets = []
-
-        df = pd.read_csv(asset_data_path, encoding='utf-8')
-
-        for _, row in df.iterrows():
-            code = str(row['code']).strip()
-            name = str(row['name']).strip()
-
-            price_list_str = row['prices']
-            price_list = ast.literal_eval(price_list_str)
-            prices = [
-                Price(
-                    date=DateUtils.parse_date(price_dict['date']),
-                    value=price_dict['value'],
-                )
-                for price_dict in price_list
-            ]
-
-            asset = Asset(code=code, name=name, prices=prices)
-            assets.append(asset)
-
-        return assets
-
-    def load_comparison_config(self, comparison_config_path: str) -> ComparisonConfig:
-        with open(comparison_config_path, 'r', encoding='utf-8') as file:
-            comparison_data = json.load(file)
-
-        date_ranges = self._load_date_ranges(comparison_data['date_ranges'])
-        portfolios = self._load_portfolios(comparison_data['portfolios'])
-
-        return ComparisonConfig(
-            date_ranges=date_ranges,
-            portfolios=portfolios,
-        )
-
-    def _load_date_ranges(self, date_range_data: List[dict]) -> List[DateRange]:
-        date_ranges = []
-
-        for item in date_range_data:
-            start_date_str = item['start']
-            end_date_str = item['end']
-
-            if start_date_str.lower() == 'today':
-                start_date = DateUtils.get_today()
-            else:
-                start_date = DateUtils.parse_date(start_date_str)
-
-            if end_date_str.lower() == 'today':
-                end_date = DateUtils.get_today()
-            else:
-                end_date = DateUtils.parse_date(end_date_str)
-
-            date_range = DateRange(start_date=start_date, end_date=end_date)
-            date_ranges.append(date_range)
-
-        return date_ranges
-
-    def _load_portfolios(self, portfolio_data: List[dict]) -> List[Portfolio]:
-        portfolios = []
-
-        for item in portfolio_data:
-            is_disabled = item.get('disabled', False)
-            if is_disabled:
-                continue
-
-            title = item['title']
-            assets = self._load_portfolio_assets(item['assets'])
-            is_set_default = item.get('set_default', False)
-
-            portfolio = Portfolio(title=title, assets=assets, is_set_default=is_set_default)
-            portfolios.append(portfolio)
-
-        return portfolios
-    
-    def _load_portfolio_assets(self, portfolio_asset_data: List[dict]) -> List[PortfolioAsset]:
-        portfolio_assets = []
-
-        for item in portfolio_asset_data:
-            asset = next(
-                (a for a in self.asset_data if a.get_code() == item['code']),
-                None
-            )
-            weight = item.get('weight', None)
-            withholding_tax_rate = item.get('withholding_tax_rate', 0.0) # Default to 0.0
-
-            portfolio_asset = PortfolioAsset(asset=asset, weight=weight, withholding_tax_rate=withholding_tax_rate)
-            portfolio_assets.append(portfolio_asset)
-
-        return portfolio_assets
