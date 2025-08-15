@@ -17,10 +17,15 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 """
 
 
+from __future__ import annotations
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from .asset import Asset
+
 import json
 from typing import List
 
-from .asset import Asset
 from .date_range import DateRange
 from .portfolio import Portfolio
 

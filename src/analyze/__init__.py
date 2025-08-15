@@ -18,7 +18,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 
 from .analyzer import Analyzer
-from .portfolio_performance_generator import PortfolioPerformanceGenerator
+from .portfolio_performance import PortfolioPerformance
 
 
-__all__ = ["Analyzer", "PortfolioPerformanceGenerator"]
+__all__ = ["Analyzer", "PortfolioPerformance"]

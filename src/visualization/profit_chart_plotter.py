@@ -17,24 +17,26 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 """
 
 
+from __future__ import annotations
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from analyze import Analyzer
+
 import matplotlib.dates as mdates
 import matplotlib.pyplot as plt
-from matplotlib.dates import DateFormatter
-from matplotlib.ticker import PercentFormatter
-from typing import List
+import matplotlib.ticker as mticker
 
-from data_struct import PerformancePortfolioComparison
 from utils import DateUtils
 
 
 class ProfitChartPlotter:
-    def __init__(self, performance_portfolio_comparisons: List[PerformancePortfolioComparison]):
-        self.performance_portfolio_comparisons = performance_portfolio_comparisons
-        self._check_validity()
+    def __init__(self, analyzer: Analyzer):
+        self.analyzer = analyzer
 
     def plot_charts(self):
-        for ppc in self.performance_portfolio_comparisons:
-            date_range = ppc.get_date_range()
+        for pab in self.analyzer.generate_performance_asset_batches():
+            date_range = pab['date_range']
             start_date = date_range.get_start_date()
             end_date = date_range.get_end_date()
 
@@ -42,14 +44,14 @@ class ProfitChartPlotter:
             fig, ax = plt.subplots(figsize=(12, 6))
 
             # Plot each performance asset
-            for performance_asset in ppc.get_performance_assets():
-                asset = performance_asset.get_asset()
+            for asset in pab['performance_assets']:
                 prices = asset.get_prices(date_range)
+                is_set_default = asset.is_set_default if hasattr(asset, 'is_set_default') else False
 
                 dates = [price.get_date() for price in prices]
-                profit_ratios = performance_asset.get_profit_ratios()
+                profit_ratios = asset.calculate_profit_ratios()
 
-                label = f"{asset.get_name()} ({asset.get_code()}){' [Default]' if performance_asset.is_set_default() else ''}"
+                label = f"{asset.get_name()} ({asset.get_code()}){' [Default]' if is_set_default else ''}"
                 ax.plot(dates, profit_ratios, label=label, linewidth=2)
 
             # Format the plot
@@ -60,21 +62,13 @@ class ProfitChartPlotter:
             )
             ax.set_xlabel("Date", fontsize=12)
             ax.set_ylabel("Profit Ratio", fontsize=12)
-            ax.yaxis.set_major_formatter(PercentFormatter(xmax=1.0))
+            ax.yaxis.set_major_formatter(mticker.PercentFormatter(xmax=1.0))
 
-            # Format x-axis ticks as dd.mm.yyyy
-            ax.xaxis.set_major_formatter(DateFormatter(DateUtils.get_date_format()))
+            # Format x-axis ticks
+            ax.xaxis.set_major_formatter(mdates.DateFormatter(DateUtils.get_date_format()))
             ax.xaxis.set_major_locator(mdates.AutoDateLocator())
 
             ax.grid(True, which='major', axis='y', linestyle='--', alpha=0.5)
             ax.legend(title="Assets", fontsize=10)
             plt.tight_layout()
             plt.show()
-
-    def _check_validity(self):
-        if not self.performance_portfolio_comparisons:
-            raise ValueError("Performance portfolio comparisons cannot be empty.")
-        if not isinstance(self.performance_portfolio_comparisons, list):
-            raise ValueError("Performance portfolio comparisons must be a list.")
-        if not all(isinstance(ppc, PerformancePortfolioComparison) for ppc in self.performance_portfolio_comparisons):
-            raise ValueError("All items in the performance portfolio comparisons must be instances of PerformancePortfolioComparison.")

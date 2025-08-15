@@ -20,7 +20,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 import argparse
 import logging
 
-from analyze import analyzer
+from analyze import Analyzer
 from data_io import DataLoader
 from utils import DateUtils
 from visualization import ProfitChartPlotter
@@ -47,7 +47,7 @@ class Main:
         self.default_config_path = default_config_path
         self.default_date_format = default_date_format
         self._validate_default_args()
-        
+
         self.args = self.parse_args()
         self._validate_user_args()
 
@@ -88,10 +88,8 @@ class Main:
         )
         comparison_config = loader.get_comparison_config()
 
-        analyzer_instance = analyzer.Analyzer(comparison_config)
-        performance_portfolio_comparisons = analyzer_instance.get_performance_portfolio_comparison_list()
-
-        plotter = ProfitChartPlotter(performance_portfolio_comparisons=performance_portfolio_comparisons)
+        analyzer = Analyzer(comparison_config)
+        plotter = ProfitChartPlotter(analyzer)
         plotter.plot_charts()
 
     def _validate_default_args(self) -> bool:

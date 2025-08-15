@@ -17,53 +17,30 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 """
 
 
-from typing import List
+from __future__ import annotations
+from typing import TYPE_CHECKING
 
-from .portfolio_performance_generator import PortfolioPerformanceGenerator
-from data_struct import PerformancePortfolioComparison, ComparisonConfig
+if TYPE_CHECKING:
+    from data_struct import ComparisonConfig
+
+from typing import Iterator
 
 
 class Analyzer:
     def __init__(self, comparison_config: ComparisonConfig):
         self.comparison_config = comparison_config
-        self._check_validity()
 
-        self.performance_portfolio_comparison_list = self.generate_performance_portfolio_comparison_list()
-
-    def get_comparison_config(self) -> ComparisonConfig:
-        return self.comparison_config
-
-    def get_performance_portfolio_comparison_list(self) -> List[PerformancePortfolioComparison]:
-        return self.performance_portfolio_comparison_list
-
-    def generate_performance_portfolio_comparison_list(self) -> List[PerformancePortfolioComparison]:
-        data_ranges = self.get_comparison_config().get_date_ranges()
-        portfolios = self.get_comparison_config().get_portfolios()
-
-        performance_portfolio_comparison_list = []
+    def generate_performance_asset_batches(self) -> Iterator[dict]:
+        data_ranges = self.comparison_config.get_date_ranges()
+        portfolios = self.comparison_config.get_portfolios()
 
         for date_range in data_ranges:
-            performance_assets = []
+            performance_assets = [
+                portfolio.generate_performance_asset(date_range)
+                for portfolio in portfolios
+            ]
 
-            for portfolio in portfolios:
-                portfolio_performance_generator = PortfolioPerformanceGenerator(
-                    portfolio=portfolio,
-                    date_range=date_range,
-                )
-                performance_asset = portfolio_performance_generator.get_portfolio_performance_asset()
-                performance_assets.append(performance_asset)
-
-            performance_portfolio_comparison = PerformancePortfolioComparison(
-                date_range=date_range,
-                performance_assets=performance_assets,
-            )
-            performance_portfolio_comparison_list.append(performance_portfolio_comparison)
-
-        return performance_portfolio_comparison_list
-
-    def _check_validity(self) -> bool:
-        if not self.comparison_config:
-            raise ValueError("Comparison config cannot be empty.")
-        if not isinstance(self.comparison_config, ComparisonConfig):
-            raise ValueError("Comparison config must be an instance of the ComparisonConfig class.")
-        return True
+            yield {
+                'date_range': date_range,
+                'performance_assets': performance_assets,
+            }
