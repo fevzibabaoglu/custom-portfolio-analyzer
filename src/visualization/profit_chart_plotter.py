@@ -26,6 +26,7 @@ if TYPE_CHECKING:
 import matplotlib.dates as mdates
 import matplotlib.pyplot as plt
 import matplotlib.ticker as mticker
+from datetime import date
 
 from utils import DateUtils
 
@@ -62,13 +63,23 @@ class ProfitChartPlotter:
             )
             ax.set_xlabel("Date", fontsize=12)
             ax.set_ylabel("Profit Ratio", fontsize=12)
+
             ax.yaxis.set_major_formatter(mticker.PercentFormatter(xmax=1.0))
-
-            # Format x-axis ticks
-            ax.xaxis.set_major_formatter(mdates.DateFormatter(DateUtils.get_date_format()))
-            ax.xaxis.set_major_locator(mdates.AutoDateLocator())
-
+            self._configure_date_axis(ax, start_date, end_date)
             ax.grid(True, which='major', axis='y', linestyle='--', alpha=0.5)
+            ax.grid(True, which='major', axis='x', linestyle='--', alpha=0.5)
+
             ax.legend(title="Assets", fontsize=10)
             plt.tight_layout()
             plt.show()
+
+    @staticmethod
+    def _configure_date_axis(ax, start_date: date, end_date: date):
+        locator = mdates.AutoDateLocator(minticks=3, maxticks=10)
+        ax.xaxis.set_major_locator(locator)
+
+        formatter = mdates.ConciseDateFormatter(locator, show_offset=False)
+        ax.xaxis.set_major_formatter(formatter)
+
+        ax.format_coord = lambda x, y: f'x={DateUtils.format_date(mdates.num2date(x).date())}, y={y:.3%}'
+        ax.set_xlim(start_date, end_date)
