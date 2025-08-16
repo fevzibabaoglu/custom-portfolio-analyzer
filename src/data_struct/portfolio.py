@@ -51,7 +51,11 @@ class Portfolio:
 
         # Get assets, their weights and withholding tax rates from the portfolio
         asset_data_tuples = [
-            (asset.get_asset(), asset.get_weight(), asset.get_withholding_tax_rate())
+            (
+                asset.get_asset(),
+                asset.get_weight(),
+                asset.get_asset().get_additional_info().get_withholding_tax_rate(),
+            )
             for asset in self.get_assets()
         ]
         assets, weights, withholding_tax_rates = map(list, zip(*asset_data_tuples))

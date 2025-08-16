@@ -17,6 +17,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 """
 
 
+from .asset_additional_info import AssetAdditionalInfo
 from .asset import Asset
 from .comparison_config import ComparisonConfig
 from .date_range import DateRange
@@ -26,6 +27,7 @@ from .price import Price
 
 
 __all__ = [
+    "AssetAdditionalInfo",
     "Asset",
     "ComparisonConfig",
     "DateRange",

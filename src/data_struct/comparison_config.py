@@ -26,6 +26,7 @@ if TYPE_CHECKING:
 import json
 from typing import List
 
+from .asset_additional_info import AssetAdditionalInfo
 from .date_range import DateRange
 from .portfolio import Portfolio
 
@@ -55,6 +56,16 @@ class ComparisonConfig:
             Portfolio.from_dict(item, asset_list)
             for item in portfolios_data
         ] if portfolios_data else None
+
+        additional_data = data.get("additional_fund_info", None)
+        if additional_data:
+            for asset in asset_list:
+                asset_code = asset.get_code()
+                additional_fund_data = additional_data.get(asset_code, None)
+
+                if additional_fund_data is not None:
+                    additional_info = AssetAdditionalInfo.from_dict(additional_fund_data)
+                    asset.set_additional_info(additional_info)
 
         return cls(date_ranges=date_ranges, portfolios=portfolios)
 

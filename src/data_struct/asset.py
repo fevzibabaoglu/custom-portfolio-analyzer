@@ -20,22 +20,25 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 import pandas as pd
 from typing import List, Optional
 
+from .asset_additional_info import AssetAdditionalInfo
 from .date_range import DateRange
 from .price import Price
 from utils import DataFrameUtils
 
 
 class Asset:
-    def __init__(self, code: str, name: str, prices: List[Price]):
+    def __init__(
+        self,
+        code: str,
+        name: str,
+        prices: List[Price],
+        additional_info: Optional[AssetAdditionalInfo] = None
+    ):
         self.code = code
         self.name = name
         self.prices = prices
+        self.additional_info = additional_info
         self._check_validity()
-
-        self.date_range = DateRange(
-            start_date=prices[0].get_date(),
-            end_date=prices[-1].get_date(),
-        )
 
     def get_code(self) -> str:
         return self.code
@@ -52,8 +55,18 @@ class Asset:
             if date_range.get_start_date() <= p.get_date() <= date_range.get_end_date()
         ]
 
+    def get_additional_info(self) -> AssetAdditionalInfo:
+        return self.additional_info
+
+    def set_additional_info(self, additional_info: AssetAdditionalInfo):
+        """ Sets additional fund information not found in the main asset data file."""
+        self.additional_info = additional_info
+
     def get_date_range(self) -> DateRange:
-        return self.date_range
+        return DateRange(
+            start_date=self.get_prices()[0].get_date(),
+            end_date=self.get_prices()[-1].get_date(),
+        )
 
     def calculate_profit_ratios(self) -> List[float]:
         prices = [price.get_value() for price in self.get_prices()]
@@ -102,4 +115,6 @@ class Asset:
             raise ValueError("Prices must be a list.")
         if not all(isinstance(price, Price) for price in self.get_prices()):
             raise ValueError("All prices must be instances of the Price class.")
+        if self.get_additional_info() is not None and not isinstance(self.get_additional_info(), AssetAdditionalInfo):
+            raise ValueError("Additional info must be an instance of AssetAdditionalInfo class.")
         return True
