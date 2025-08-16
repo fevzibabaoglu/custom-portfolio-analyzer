@@ -23,6 +23,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from data_struct import ComparisonConfig
 
+
 from typing import Iterator
 
 

@@ -22,6 +22,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from .date_range import DateRange
 
+
 from typing import List
 
 from .asset import Asset

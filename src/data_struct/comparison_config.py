@@ -23,6 +23,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from .asset import Asset
 
+
 import json
 from typing import List
 
