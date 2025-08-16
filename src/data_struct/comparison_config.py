@@ -53,8 +53,9 @@ class ComparisonConfig:
 
         portfolios_data = data.get('portfolios', None)
         portfolios = [
-            Portfolio.from_dict(item, asset_list)
+            p 
             for item in portfolios_data
+            if (p := Portfolio.from_dict(item, asset_list)) is not None
         ] if portfolios_data else None
 
         additional_data = data.get("additional_fund_info", None)

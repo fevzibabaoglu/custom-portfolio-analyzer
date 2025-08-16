@@ -106,11 +106,14 @@ class Portfolio:
 
     @classmethod
     def from_dict(cls, data: dict, asset_list: List[Asset]) -> 'Portfolio':
+        is_disabled = data.get('disabled', False)
+        if is_disabled:
+            return None
+
         title = data.get('title', None)
         is_set_default = data.get('is_set_default', False)
 
         asset_data = data.get('assets', None)
-
         assets = [
             PortfolioAsset.from_dict(asset, asset_list)
             for asset in asset_data
