@@ -17,6 +17,13 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 """
 
 
+from __future__ import annotations
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from datetime import date
+
+
 import pandas as pd
 from typing import List, Optional
 
@@ -54,6 +61,11 @@ class Asset:
             p for p in self.prices
             if date_range.get_start_date() <= p.get_date() <= date_range.get_end_date()
         ]
+
+    def get_price(self, _date: date) -> Optional[Price]:
+        date_range = DateRange(_date, _date)
+        prices = self.get_prices(date_range)
+        return prices[0] if prices else None
 
     def get_additional_info(self) -> AssetAdditionalInfo:
         return self.additional_info

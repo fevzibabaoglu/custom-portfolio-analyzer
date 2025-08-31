@@ -23,29 +23,28 @@ from typing import List
 class PortfolioPerformance:
     @staticmethod
     def static_allocation_performance_index(
-        weights: List[float],
+        shares: List[float],
         withholding_tax_rates: List[float],
+        reference_prices: List[float],
         initial_prices: List[float],
         final_prices: List[float],
     ) -> float:
         """Calculate the performance index of the portfolio based on static allocation."""
 
         if len({
-            len(weights),
+            len(shares),
             len(withholding_tax_rates),
+            len(reference_prices),
             len(initial_prices),
             len(final_prices),
         }) != 1:
-            raise ValueError("Weights, withholding tax rates, initial prices, and final prices must have the same amount of elements.")
+            raise ValueError("All input lists must have the same length")
 
         nominator = sum(
-            weight * ((final / initial) * (1 - tax) + tax if final > initial else final / initial)
-            for weight, tax, initial, final in zip(weights, withholding_tax_rates, initial_prices, final_prices)
+            (share * reference) * ((final / initial) * (1 - tax) + tax if final > initial else final / initial)
+            for share, tax, reference, initial, final in zip(shares, withholding_tax_rates, reference_prices, initial_prices, final_prices)
         )
 
-        denominator = sum(
-            weight / initial_price
-            for weight, initial_price in zip(weights, initial_prices)
-        )
+        denominator = sum(shares)
 
         return nominator / denominator

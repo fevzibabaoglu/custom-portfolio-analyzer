@@ -23,18 +23,28 @@ if TYPE_CHECKING:
     from .date_range import DateRange
 
 
-from typing import List
+from datetime import date
+from typing import List, Optional
 
 from .asset import Asset
+from .date_range import DateRange
 from .portfolio_asset import PortfolioAsset
 from .price import Price
 from analyze import PortfolioPerformance
+from utils import DateUtils
 
 
 class Portfolio:
-    def __init__(self, title: str, assets: List[PortfolioAsset], is_set_default: bool = False):
+    def __init__(
+        self,
+        title: str,
+        assets: List[PortfolioAsset],
+        price_reference_date: date,
+        is_set_default: bool,
+    ):
         self.title = title
         self.assets = assets
+        self.price_reference_date = price_reference_date
         self._is_set_default = is_set_default
         self._check_validity()
 
@@ -43,6 +53,9 @@ class Portfolio:
 
     def get_assets(self) -> List[PortfolioAsset]:
         return self.assets
+
+    def get_price_reference_date(self) -> date:
+        return self.price_reference_date
 
     def is_set_default(self) -> bool:
         return self._is_set_default
@@ -54,12 +67,12 @@ class Portfolio:
         asset_data_tuples = [
             (
                 asset.get_asset(),
-                asset.get_weight(),
+                asset.get_share(),
                 asset.get_asset().get_additional_info().get_withholding_tax_rate(),
             )
             for asset in self.get_assets()
         ]
-        assets, weights, withholding_tax_rates = map(list, zip(*asset_data_tuples))
+        assets, shares, withholding_tax_rates = map(list, zip(*asset_data_tuples))
 
         # Get the price history for each asset over the given date range
         asset_prices_list = [
@@ -81,8 +94,13 @@ class Portfolio:
 
         for prices_on_date in prices_by_date:
             sapi = PortfolioPerformance.static_allocation_performance_index(
-                weights=weights,
+                shares=shares,
                 withholding_tax_rates=withholding_tax_rates,
+                reference_prices=[
+                    price.get_value() if price
+                    else None
+                    for price in self._get_reference_prices(self.get_price_reference_date(), assets)
+                ],
                 initial_prices=[price.get_value() for price in initial_prices],
                 final_prices=[price.get_value() for price in prices_on_date],
             )
@@ -114,17 +132,37 @@ class Portfolio:
         title = data.get('title', None)
         is_set_default = data.get('is_set_default', False)
 
+        price_reference_date_str = data.get('price_reference_date', None)
+        price_reference_date = (
+            DateUtils.parse_date(price_reference_date_str)
+            if price_reference_date_str
+            else min(
+                asset.get_prices()[-1].get_date()
+                for asset in asset_list
+            )
+        )
+        reference_prices = cls._get_reference_prices(price_reference_date, asset_list)
+
         asset_data = data.get('assets', None)
         assets = [
-            PortfolioAsset.from_dict(asset, asset_list)
+            PortfolioAsset.from_dict(asset, asset_list, reference_prices)
             for asset in asset_data
         ] if asset_data else None
 
         return cls(
             title=title,
             assets=assets,
+            price_reference_date=price_reference_date,
             is_set_default=is_set_default,
         )
+
+    @staticmethod
+    def _get_reference_prices(price_reference_date: date, asset_list: List[Asset]) -> List[Optional[Price]]:
+        reference_prices = [
+            asset.get_price(price_reference_date)
+            for asset in asset_list
+        ]
+        return reference_prices
 
     def _check_validity(self) -> bool:
         if not self.get_title():
@@ -137,13 +175,12 @@ class Portfolio:
             raise ValueError("Assets must be a list.")
         if not all(isinstance(asset, PortfolioAsset) for asset in self.get_assets()):
             raise ValueError("All assets must be instances of the PortfolioAsset class.")
+        if not self.get_price_reference_date():
+            raise ValueError("price_reference_date cannot be empty.")
+        if not isinstance(self.get_price_reference_date(), date):
+            raise ValueError("price_reference_date must be a date object.")
         if self.is_set_default() is None:
             raise ValueError("is_set_default cannot be empty.")
         if not isinstance(self.is_set_default(), bool):
             raise ValueError("is_set_default must be a boolean.")
-
-        total_weight = sum(asset.get_weight() for asset in self.get_assets())
-        if total_weight != 1.0:
-            raise ValueError(f"Total weight of assets in portfolio '{self.get_title()}' must equal 1.0, but is {total_weight}.")
-
         return True

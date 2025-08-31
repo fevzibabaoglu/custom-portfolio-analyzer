@@ -17,47 +17,68 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 """
 
 
-from typing import List
+from __future__ import annotations
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from .price import Price
+
+
+from typing import List, Optional
 
 from .asset import Asset
 
 
 class PortfolioAsset:
-    def __init__(self, asset: Asset, weight: float):
+    def __init__(self, asset: Asset, share: float):
         self.asset = asset
-        self.weight = weight
+        self.share = share
         self._check_validity()
 
     def get_asset(self) -> Asset:
         return self.asset
 
-    def get_weight(self) -> float:
-        return self.weight
+    def get_share(self) -> float:
+        return self.share
 
     @classmethod
-    def from_dict(cls, data: dict, asset_list: List[Asset]) -> 'PortfolioAsset':
-        weight = data.get('weight', None)
-
+    def from_dict(cls, data: dict, asset_list: List[Asset], reference_prices: List[Optional[Price]]) -> 'PortfolioAsset':
         asset_code = data.get('code', None)
-        asset = next(
-            (a for a in asset_list if a.get_code() == asset_code),
-            None,
-        ) if asset_code else None
+        asset, reference_price = next(
+            (
+                (a, rp)
+                for a, rp in zip(asset_list, reference_prices)
+                if a.get_code() == asset_code
+            ),
+            (None, None),
+        )
+
+        weight = data.get('weight', None)
+        share = data.get('share', None)
+
+        if weight is None and share is None:
+            raise ValueError(f"Either weight or share must be provided for {asset.get_code()}.")
+        if share is None:
+            share = cls._calculate_share_from_weight(weight, reference_price)
 
         return cls(
             asset=asset,
-            weight=weight,
+            share=float(share),
         )
+
+    @staticmethod
+    def _calculate_share_from_weight(weight: float, reference_price: Optional[Price]) -> float:
+        if reference_price is None:
+            raise ValueError("Price on reference date is not available.")
+        return weight / reference_price.get_value()
 
     def _check_validity(self) -> bool:
         if not self.get_asset():
             raise ValueError("Asset cannot be empty.")
         if not isinstance(self.get_asset(), Asset):
             raise ValueError("Asset must be an instance of the Asset class.")
-        if self.get_weight() is None:
-            raise ValueError("Weight cannot be None.")
-        if not isinstance(self.get_weight(), float):
-            raise ValueError("Weight must be a float number.")
-        if not (0 < self.get_weight() <= 1):
-            raise ValueError("Weight must be between 0 and 1.")
+        if self.get_share() is None:
+            raise ValueError("Share cannot be None.")
+        if not isinstance(self.get_share(), float):
+            raise ValueError("Share must be a float number.")
         return True
