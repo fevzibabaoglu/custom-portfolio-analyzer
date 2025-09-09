@@ -59,7 +59,7 @@ class Asset:
 
         return [
             p for p in self.prices
-            if date_range.get_start_date() <= p.get_date() <= date_range.get_end_date()
+            if date_range.includes(p.get_date())
         ]
 
     def get_price(self, _date: date) -> Optional[Price]:

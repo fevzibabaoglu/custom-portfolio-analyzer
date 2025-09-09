@@ -17,7 +17,8 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 """
 
 
-from datetime import date
+from datetime import date, timedelta
+from typing import List
 
 from utils import DateUtils
 
@@ -31,16 +32,17 @@ class DateRange:
     def get_start_date(self) -> date:
         return self.start_date
 
-    def set_start_date(self, start_date: date):
-        self.start_date = start_date
-        self._check_validity()
-
     def get_end_date(self) -> date:
         return self.end_date
 
-    def set_end_date(self, end_date: date):
-        self.end_date = end_date
-        self._check_validity()
+    def includes(self, target_date: date) -> bool:
+        return self.get_start_date() <= target_date <= self.get_end_date()
+
+    def get_days_generator(self) -> List[date]:
+       return (
+           self.get_start_date() + timedelta(days=i)
+           for i in range((self.get_end_date() - self.get_start_date()).days + 1)
+        )
 
     @classmethod
     def from_dict(cls, data: dict) -> 'DateRange':
