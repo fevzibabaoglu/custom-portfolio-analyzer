@@ -41,7 +41,7 @@ class Price:
 
         return cls(
             date=DateUtils.parse_date(date_str) if date_str else None,
-            value=float(value_str) if value_str else None,
+            value=float(value_str) if value_str is not None else None,
         )
 
     def _check_validity(self) -> bool:
