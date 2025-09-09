@@ -88,3 +88,5 @@ class ProfitChartPlotter:
 
         ax.format_coord = lambda x, y: f'x={DateUtils.format_date(mdates.num2date(x).date())}, y={y:.3%}'
         ax.set_xlim(start_date, end_date)
+        ax.autoscale(enable=True, axis='both', tight=False)
+        ax.margins(x=0.01)
