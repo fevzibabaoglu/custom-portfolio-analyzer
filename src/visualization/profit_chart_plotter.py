@@ -29,6 +29,7 @@ import matplotlib.pyplot as plt
 import matplotlib.ticker as mticker
 from datetime import date
 
+from data_struct import PerformanceReturn
 from utils import DateUtils
 
 
@@ -37,8 +38,8 @@ class ProfitChartPlotter:
         self.analyzer = analyzer
 
     def plot_charts(self):
-        for pab in self.analyzer.generate_performance_asset_batches():
-            date_range = pab['date_range']
+        for pib in self.analyzer.generate_performance_info_batches():
+            date_range = pib['date_range']
             start_date = date_range.get_start_date()
             end_date = date_range.get_end_date()
 
@@ -46,14 +47,17 @@ class ProfitChartPlotter:
             fig, ax = plt.subplots(figsize=(12, 6))
 
             # Plot each performance asset
-            for asset in pab['performance_assets']:
-                prices = asset.get_prices(date_range)
-                is_set_default = asset.is_set_default if hasattr(asset, 'is_set_default') else False
+            for performance_info in pib['performance_infos']:
+                portfolio_code = performance_info['portfolio_code']
+                portfolio_title = performance_info['portfolio_title']
+                performance_returns = performance_info['performance_returns']
+                is_set_default = performance_info['is_set_default']
 
-                dates = [price.get_date() for price in prices]
-                profit_ratios = asset.calculate_profit_ratios()
+                dates = [performance_return.get_date() for performance_return in performance_returns]
+                profit_ratios = PerformanceReturn.calculate_profit_ratios(performance_returns)
 
-                label = f"{asset.get_name()} ({asset.get_code()}){' [Default]' if is_set_default else ''}"
+                default_label = ' [Default]' if is_set_default else ''
+                label = f"{portfolio_title} ({portfolio_code}){default_label}"
                 ax.plot(dates, profit_ratios, label=label, linewidth=2)
 
             # Format the plot

@@ -26,22 +26,27 @@ if TYPE_CHECKING:
 
 from typing import Iterator
 
+from .portfolio_performance import PortfolioPerformance
+
 
 class Analyzer:
     def __init__(self, comparison_config: ComparisonConfig):
         self.comparison_config = comparison_config
 
-    def generate_performance_asset_batches(self) -> Iterator[dict]:
+    def generate_performance_info_batches(self) -> Iterator[dict]:
         data_ranges = self.comparison_config.get_date_ranges()
         portfolios = self.comparison_config.get_portfolios()
 
         for date_range in data_ranges:
-            performance_assets = [
-                portfolio.generate_performance_asset(date_range)
-                for portfolio in portfolios
-            ]
+            performance_infos = []
+
+            for portfolio in portfolios:
+                portfolio.set_asset_order_dates(date_range.get_start_date())
+
+                performance_info = PortfolioPerformance.generate_performance_info(portfolio)
+                performance_infos.append(performance_info)
 
             yield {
                 'date_range': date_range,
-                'performance_assets': performance_assets,
+                'performance_infos': performance_infos,
             }

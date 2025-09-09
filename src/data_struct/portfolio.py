@@ -16,21 +16,13 @@ You should have received a copy of the GNU Lesser General Public License
 along with this program. If not, see <https://www.gnu.org/licenses/>.
 """
 
-from __future__ import annotations
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from .date_range import DateRange
-
 
 from datetime import date
 from typing import List, Optional
 
 from .asset import Asset
-from .date_range import DateRange
 from .portfolio_asset import PortfolioAsset
 from .price import Price
-from analyze import PortfolioPerformance
 from utils import DateUtils
 
 
@@ -64,70 +56,7 @@ class Portfolio:
 
     def is_specific(self) -> bool:
         return self._is_specific
-    
-    def generate_performance_asset(self, date_range: DateRange) -> Asset:
-        performance_asset_prices: List[Price] = []
 
-        # Get assets, their weights and withholding tax rates from the portfolio
-        asset_data_tuples = [
-            (
-                asset.get_asset(),
-                asset.get_share(),
-                asset.get_asset().get_additional_info().get_withholding_tax_rate(),
-            )
-            for asset in self.get_assets()
-        ]
-        assets, shares, withholding_tax_rates = map(list, zip(*asset_data_tuples))
-
-        # Get the price history for each asset over the given date range
-        asset_prices_list = [
-            asset.get_prices(date_range)
-            for asset in assets
-        ]
-
-        # Filter each asset's price history to only common dates
-        date_sets = [set(p.get_date() for p in prices) for prices in asset_prices_list]
-        common_dates = sorted(set.intersection(*date_sets))
-        aligned_asset_prices = [
-            [p for p in prices if p.get_date() in common_dates]
-            for prices in asset_prices_list
-        ]
-
-        # Transpose the list to group prices by date
-        prices_by_date = list(zip(*aligned_asset_prices))
-        initial_prices = prices_by_date[0]
-
-        for prices_on_date in prices_by_date:
-            sapi = PortfolioPerformance.static_allocation_performance_index(
-                shares=shares,
-                withholding_tax_rates=withholding_tax_rates,
-                reference_prices=[
-                    price.get_value() if price
-                    else None
-                    for price in self._get_reference_prices(self.get_price_reference_date(), assets)
-                ],
-                initial_prices=[price.get_value() for price in initial_prices],
-                final_prices=[price.get_value() for price in prices_on_date],
-            )
-
-            portfolio_performance_price = Price(
-                date=prices_on_date[0].get_date(),
-                value=sapi,
-            )
-            performance_asset_prices.append(portfolio_performance_price)
-
-        title = self.get_title()
-        portfolio_code = ''.join(word[0].upper() for word in title.split())
-
-        performance_asset = Asset(
-            code=portfolio_code,
-            name=title,
-            prices=performance_asset_prices,
-        )
-        performance_asset.is_set_default = self.is_set_default()
-
-        return performance_asset
-        
     def set_asset_order_dates(self, order_date: date):
         if not self.is_specific():
             max_first_price_date = max(
@@ -138,7 +67,6 @@ class Portfolio:
 
             for asset in self.get_assets():
                 asset.set_order_date(min_order_date)
-
 
     @classmethod
     def from_dict(cls, data: dict, asset_list: List[Asset]) -> 'Portfolio':

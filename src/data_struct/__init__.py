@@ -21,6 +21,7 @@ from .asset_additional_info import AssetAdditionalInfo
 from .asset import Asset
 from .comparison_config import ComparisonConfig
 from .date_range import DateRange
+from .performance_return import PerformanceReturn
 from .portfolio_asset import PortfolioAsset
 from .portfolio import Portfolio
 from .price import Price
@@ -31,6 +32,7 @@ __all__ = [
     "Asset",
     "ComparisonConfig",
     "DateRange",
+    "PerformanceReturn",
     "PortfolioAsset",
     "Portfolio",
     "Price",

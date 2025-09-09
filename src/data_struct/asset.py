@@ -80,11 +80,6 @@ class Asset:
             end_date=self.get_prices()[-1].get_date(),
         )
 
-    def calculate_profit_ratios(self) -> List[float]:
-        prices = [price.get_value() for price in self.get_prices()]
-        initial_price = prices[0]
-        return [price / initial_price - 1 for price in prices]
-
     @classmethod
     def from_dict(cls, data: dict) -> 'Asset':
         code = data.get("code", None)
