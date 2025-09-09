@@ -41,11 +41,13 @@ class Portfolio:
         assets: List[PortfolioAsset],
         price_reference_date: date,
         is_set_default: bool,
+        is_specific: bool,
     ):
         self.title = title
         self.assets = assets
         self.price_reference_date = price_reference_date
         self._is_set_default = is_set_default
+        self._is_specific = is_specific
         self._check_validity()
 
     def get_title(self) -> str:
@@ -60,6 +62,9 @@ class Portfolio:
     def is_set_default(self) -> bool:
         return self._is_set_default
 
+    def is_specific(self) -> bool:
+        return self._is_specific
+    
     def generate_performance_asset(self, date_range: DateRange) -> Asset:
         performance_asset_prices: List[Price] = []
 
@@ -122,6 +127,18 @@ class Portfolio:
         performance_asset.is_set_default = self.is_set_default()
 
         return performance_asset
+        
+    def set_asset_order_dates(self, order_date: date):
+        if not self.is_specific():
+            max_first_price_date = max(
+                asset.get_asset().get_prices()[0].get_date()
+                for asset in self.get_assets()
+            )
+            min_order_date = max(order_date, max_first_price_date)
+
+            for asset in self.get_assets():
+                asset.set_order_date(min_order_date)
+
 
     @classmethod
     def from_dict(cls, data: dict, asset_list: List[Asset]) -> 'Portfolio':
@@ -149,11 +166,16 @@ class Portfolio:
             for asset in asset_data
         ] if asset_data else None
 
+        are_assets_specific = [asset.is_specific for asset in assets]
+        if any(are_assets_specific) and not all(are_assets_specific):
+            raise ValueError("Cannot set order_date for portfolio with mixed specific and non-specific assets.")
+
         return cls(
             title=title,
             assets=assets,
             price_reference_date=price_reference_date,
             is_set_default=is_set_default,
+            is_specific=all(are_assets_specific),
         )
 
     @staticmethod

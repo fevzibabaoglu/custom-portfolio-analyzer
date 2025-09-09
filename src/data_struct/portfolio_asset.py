@@ -24,15 +24,19 @@ if TYPE_CHECKING:
     from .price import Price
 
 
+from datetime import date
 from typing import List, Optional
 
 from .asset import Asset
+from utils import DateUtils
 
 
 class PortfolioAsset:
-    def __init__(self, asset: Asset, share: float):
+    def __init__(self, asset: Asset, share: float, order_date: Optional[date] = None):
         self.asset = asset
         self.share = share
+        self.order_date = order_date
+        self.is_specific = order_date is not None
         self._check_validity()
 
     def get_asset(self) -> Asset:
@@ -41,8 +45,29 @@ class PortfolioAsset:
     def get_share(self) -> float:
         return self.share
 
+    def get_order_date(self) -> date:
+        return self.order_date
+
+    def set_order_date(self, order_date: date):
+        if not self.is_specific:
+            available_order_date = next(
+                (
+                    price.get_date()
+                    for price in self.get_asset().get_prices()
+                    if price.get_date() >= order_date
+                ),
+                None,
+            )
+            self.order_date = available_order_date
+            self._check_validity()
+
     @classmethod
-    def from_dict(cls, data: dict, asset_list: List[Asset], reference_prices: List[Optional[Price]]) -> 'PortfolioAsset':
+    def from_dict(
+        cls,
+        data: dict,
+        asset_list: List[Asset],
+        reference_prices: List[Optional[Price]],
+    ) -> 'PortfolioAsset':
         asset_code = data.get('code', None)
         asset, reference_price = next(
             (
@@ -51,6 +76,13 @@ class PortfolioAsset:
                 if a.get_code() == asset_code
             ),
             (None, None),
+        )
+
+        order_date_str = data.get('order_date', None)
+        order_date = (
+            DateUtils.parse_date(order_date_str)
+            if order_date_str
+            else None
         )
 
         weight = data.get('weight', None)
@@ -64,6 +96,7 @@ class PortfolioAsset:
         return cls(
             asset=asset,
             share=float(share),
+            order_date=order_date,
         )
 
     @staticmethod
@@ -77,6 +110,8 @@ class PortfolioAsset:
             raise ValueError("Asset cannot be empty.")
         if not isinstance(self.get_asset(), Asset):
             raise ValueError("Asset must be an instance of the Asset class.")
+        if self.get_order_date() is not None and not isinstance(self.get_order_date(), date):
+            raise ValueError("Order date must be a date object.")
         if self.get_share() is None:
             raise ValueError("Share cannot be None.")
         if not isinstance(self.get_share(), float):
