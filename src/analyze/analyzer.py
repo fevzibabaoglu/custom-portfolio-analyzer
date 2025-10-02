@@ -21,10 +21,10 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from data_struct import ComparisonConfig
+    from data_struct import ComparisonConfig, DateRange
 
 
-from typing import Iterator
+from typing import Dict, Iterator
 
 from .portfolio_performance import PortfolioPerformance
 
@@ -33,7 +33,7 @@ class Analyzer:
     def __init__(self, comparison_config: ComparisonConfig):
         self.comparison_config = comparison_config
 
-    def generate_performance_info_batches(self) -> Iterator[dict]:
+    def generate_performance_info_batches(self) -> Iterator[Dict]:
         data_ranges = self.comparison_config.get_date_ranges()
         portfolios = self.comparison_config.get_portfolios()
 
@@ -44,9 +44,23 @@ class Analyzer:
                 portfolio.set_asset_order_dates(date_range.get_start_date())
 
                 performance_info = PortfolioPerformance.generate_performance_info(portfolio)
+                performance_info = Analyzer._filter_performance_returns_by_date_range(performance_info, date_range)
+
                 performance_infos.append(performance_info)
 
             yield {
                 'date_range': date_range,
                 'performance_infos': performance_infos,
             }
+
+    @staticmethod
+    def _filter_performance_returns_by_date_range(performance_info: Dict, date_range: DateRange) -> Dict:
+        performance_returns = performance_info['performance_returns']
+        filtered_performance_returns = [
+            pr
+            for pr in performance_returns
+            if date_range.includes(pr.get_date())
+        ]
+        filtered_performance_returns = [pr - filtered_performance_returns[0] for pr in filtered_performance_returns]
+        performance_info['performance_returns'] = filtered_performance_returns
+        return performance_info

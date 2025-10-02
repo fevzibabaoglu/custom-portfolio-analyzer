@@ -16,6 +16,7 @@ You should have received a copy of the GNU Lesser General Public License
 along with this program. If not, see <https://www.gnu.org/licenses/>.
 """
 
+from __future__ import annotations
 
 from datetime import date
 from typing import List
@@ -42,8 +43,17 @@ class PerformanceReturn:
     def get_return_percentage_tax_applied(self) -> float:
         return self.return_percentage_tax_applied
 
+    def __sub__(self, other: PerformanceReturn) -> PerformanceReturn:
+        if not isinstance(other, PerformanceReturn):
+            raise ValueError("Subtraction is only supported between PerformanceReturn instances.")
+        return PerformanceReturn(
+            date=self.date,
+            return_percentage_raw=self.return_percentage_raw - other.return_percentage_raw,
+            return_percentage_tax_applied=self.return_percentage_tax_applied - other.return_percentage_tax_applied,
+        )
+
     @staticmethod
-    def calculate_profit_ratios(performance_return_list: List["PerformanceReturn"]) -> List[float]:
+    def calculate_profit_ratios(performance_return_list: List[PerformanceReturn]) -> List[float]:
         return [
             pr.get_return_percentage_tax_applied()
             for pr in performance_return_list

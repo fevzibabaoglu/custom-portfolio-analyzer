@@ -18,7 +18,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 
 from datetime import date, timedelta
-from typing import List
+from typing import Generator
 
 from utils import DateUtils
 
@@ -38,7 +38,7 @@ class DateRange:
     def includes(self, target_date: date) -> bool:
         return self.get_start_date() <= target_date <= self.get_end_date()
 
-    def get_days_generator(self) -> List[date]:
+    def get_days_generator(self) -> Generator[date, None, None]:
        return (
            self.get_start_date() + timedelta(days=i)
            for i in range((self.get_end_date() - self.get_start_date()).days + 1)
